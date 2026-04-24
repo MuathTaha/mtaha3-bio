@@ -5,6 +5,7 @@ import { Container } from '@/components/ui/Container';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
 import { TagChip } from '@/components/site/TagChip';
+import { Giscus } from '@/components/site/Giscus';
 import { urlFor } from '@/sanity/lib/image';
 
 export async function generateStaticParams() {
@@ -77,6 +78,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           ))}
         </div>
       ) : null}
+      <Giscus term={post.slug} />
     </Container>
   );
 }
