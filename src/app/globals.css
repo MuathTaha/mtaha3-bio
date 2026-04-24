@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Core palette — dark editorial */
+  --color-bg:            #0e0e10;
+  --color-bg-elevated:   #17171a;
+  --color-border:        #2a2a2e;
+  --color-fg:            #f5f2ea;
+  --color-fg-muted:      #c7c5bd;
+  --color-fg-dim:        #9a9aa0;
+  --color-fg-faint:      #6a6a70;
+  --color-accent:        #e8b04a;      /* warm gold */
+  --color-accent-strong: #d9961f;
+  --color-danger:        #dc2626;
+
+  /* Typography */
+  --font-sans:   "Söhne", ui-sans-serif, system-ui, sans-serif;
+  --font-serif:  "Söhne Breit", "Iowan Old Style", Georgia, serif;
+  --font-mono:   "Söhne Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Content */
+  --measure-narrow: 32rem;
+  --measure-prose:  42rem;
+  --measure-wide:   64rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "ss01" on, "ss02" on, "cv11" on;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+
+.mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+
+/* Selection */
+::selection { background: var(--color-accent); color: var(--color-bg); }
