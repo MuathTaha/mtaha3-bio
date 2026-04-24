@@ -11,6 +11,19 @@ export default async function AboutPage() {
   const cvUrl = settings.cvPdf?.asset?.url;
   return (
     <Container measure="prose">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: 'Muath Taha',
+            url: process.env.NEXT_PUBLIC_SITE_URL,
+            sameAs: settings.socials?.map((s) => s.url) ?? [],
+            description: settings.shortBio,
+          }),
+        }}
+      />
       <h1 className="mb-4 text-3xl font-semibold tracking-tight">About</h1>
       <p className="mb-8 text-lg text-[var(--color-fg-muted)]">{settings.shortBio}</p>
       {settings.longBio ? (

@@ -42,6 +42,23 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <Container measure="prose">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt ?? post.publishedAt,
+            author: { '@type': 'Person', name: 'Muath Taha', url: process.env.NEXT_PUBLIC_SITE_URL },
+            image: post.coverImage
+              ? [urlFor(post.coverImage).width(1200).height(630).url()]
+              : undefined,
+          }),
+        }}
+      />
       <header className="mb-8">
         <div className="mono mb-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
           <span>{new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '·')}</span>
