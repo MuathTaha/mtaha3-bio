@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './src/sanity/schemas';
 import { structure } from './src/sanity/structure';
+import { readingTimeAction } from './src/sanity/actions/readingTime';
 
 const singletons = ['siteSettings'];
 
@@ -19,9 +20,13 @@ export default defineConfig({
       templates.filter(({ schemaType }) => !singletons.includes(schemaType)),
   },
   document: {
-    actions: (input, context) =>
-      singletons.includes(context.schemaType)
+    actions: (input, context) => {
+      const filtered = singletons.includes(context.schemaType)
         ? input.filter(({ action }) => action && !['duplicate', 'delete'].includes(action))
-        : input,
+        : input;
+      return context.schemaType === 'post'
+        ? [...filtered, readingTimeAction]
+        : filtered;
+    },
   },
 });
