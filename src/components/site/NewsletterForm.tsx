@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { sendGAEvent } from '@next/third-parties/google';
 
 export function NewsletterForm({ cta }: { cta: string }) {
   const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ export function NewsletterForm({ cta }: { cta: string }) {
         setState('err');
         return;
       }
+      sendGAEvent('event', 'newsletter_signup');
       setMsg('Subscribed.');
       setState('ok');
       setEmail('');

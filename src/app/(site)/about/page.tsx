@@ -2,6 +2,7 @@ import { getSiteSettings } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
+import { CVDownloadButton } from '@/components/site/CVDownloadButton';
 
 export const metadata = { title: 'About' };
 export const revalidate = 300;
@@ -31,16 +32,7 @@ export default async function AboutPage() {
           <PortableText value={settings.longBio} />
         </Prose>
       ) : null}
-      {cvUrl ? (
-        <a
-          href={cvUrl}
-          download
-          data-analytics="cv_download"
-          className="mono mt-10 inline-block border border-[var(--color-border)] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[var(--color-fg)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
-        >
-          Download CV (PDF)
-        </a>
-      ) : null}
+      {cvUrl ? <CVDownloadButton url={cvUrl} /> : null}
     </Container>
   );
 }
