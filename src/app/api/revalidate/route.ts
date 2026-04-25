@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       revalidatePath('/essays', 'page');
       revalidatePath('/notes', 'page');
       revalidatePath('/rss.xml', 'page');
+      revalidatePath('/api/search-index');
     } else if (type === 'tag' && slug) {
       revalidatePath(`/tag/${slug}`, 'page');
     } else if (type === 'project' || type === 'siteSettings') {
