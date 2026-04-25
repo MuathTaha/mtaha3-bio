@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
+import { draftMode } from 'next/headers';
 import Image from 'next/image';
 import { getPostBySlug, getAllPostSlugs } from '@/sanity/lib/queries';
+import { client, draftClient } from '@/sanity/lib/client';
 import { Container } from '@/components/ui/Container';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
@@ -37,7 +39,9 @@ export const revalidate = 60;
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const { isEnabled } = await draftMode();
+  const sanity = isEnabled ? draftClient : client;
+  const post = await getPostBySlug(slug, sanity);
   if (!post) notFound();
 
   return (
