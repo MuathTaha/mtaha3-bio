@@ -48,7 +48,23 @@ export const post = defineType({
       type: 'image',
       group: 'content',
       options: { hotspot: true },
-      fields: [defineField({ name: 'alt', type: 'string', title: 'Alt text' })],
+      fields: [
+        defineField({ name: 'alt', type: 'string', title: 'Alt text' }),
+        defineField({
+          name: 'fit',
+          type: 'string',
+          title: 'Fit',
+          description: 'How the image should fit its display frame.',
+          options: {
+            list: [
+              { title: 'Contain — fits within frame, no crop', value: 'contain' },
+              { title: 'Cover — fills frame, may crop', value: 'cover' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'cover',
+        }),
+      ],
     }),
     defineField({
       name: 'body',
@@ -82,7 +98,23 @@ export const post = defineType({
         defineArrayMember({
           type: 'image',
           options: { hotspot: true },
-          fields: [defineField({ name: 'alt', type: 'string' })],
+          fields: [
+            defineField({ name: 'alt', type: 'string' }),
+            defineField({
+              name: 'fit',
+              type: 'string',
+              title: 'Fit',
+              description: 'How the image should fit its display frame.',
+              options: {
+                list: [
+                  { title: 'Contain — fits within frame, no crop', value: 'contain' },
+                  { title: 'Cover — fills frame, may crop', value: 'cover' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'contain',
+            }),
+          ],
         }),
         defineArrayMember({
           type: 'object',
@@ -142,6 +174,23 @@ export const post = defineType({
       type: 'image',
       group: 'meta',
       description: 'Optional override; falls back to coverImage.',
+      fields: [
+        defineField({ name: 'alt', type: 'string', title: 'Alt text' }),
+        defineField({
+          name: 'fit',
+          type: 'string',
+          title: 'Fit',
+          description: 'How the image should fit its display frame.',
+          options: {
+            list: [
+              { title: 'Contain — fits within frame, no crop', value: 'contain' },
+              { title: 'Cover — fills frame, may crop', value: 'cover' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'cover',
+        }),
+      ],
     }),
   ],
   preview: {

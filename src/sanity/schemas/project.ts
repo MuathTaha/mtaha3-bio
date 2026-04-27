@@ -29,6 +29,23 @@ export const project = defineType({
       name: 'logo',
       type: 'image',
       options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', type: 'string', title: 'Alt text' }),
+        defineField({
+          name: 'fit',
+          type: 'string',
+          title: 'Fit',
+          description: 'How the image should fit its display frame.',
+          options: {
+            list: [
+              { title: 'Contain — fits within frame, no crop', value: 'contain' },
+              { title: 'Cover — fills frame, may crop', value: 'cover' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'contain',
+        }),
+      ],
     }),
     defineField({
       name: 'writeup',

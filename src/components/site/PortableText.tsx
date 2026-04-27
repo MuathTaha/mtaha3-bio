@@ -1,6 +1,7 @@
 import { PortableText as BasePortableText } from '@portabletext/react';
 import Image from 'next/image';
 import { urlFor } from '@/sanity/lib/image';
+import { fitClass } from '@/lib/imageFit';
 import type { PortableTextBlock } from '@portabletext/types';
 
 export function PortableText({ value }: { value: PortableTextBlock[] }) {
@@ -17,7 +18,7 @@ export function PortableText({ value }: { value: PortableTextBlock[] }) {
                 width={1400}
                 height={900}
                 sizes="(max-width: 768px) 100vw, 700px"
-                className="h-auto w-full"
+                className={`h-auto w-full ${fitClass(value.fit, 'contain')}`}
               />
               {value.alt ? (
                 <figcaption className="mono mt-2 text-xs uppercase tracking-[0.1em] text-[var(--color-fg-faint)]">

@@ -10,6 +10,7 @@ import { TagChip } from '@/components/site/TagChip';
 import { ShareButtons } from '@/components/site/ShareButtons';
 import { Giscus } from '@/components/site/Giscus';
 import { urlFor } from '@/sanity/lib/image';
+import { fitClass } from '@/lib/imageFit';
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs();
@@ -85,7 +86,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             alt={post.coverImage.alt ?? ''}
             fill
             sizes="(max-width: 768px) 100vw, 700px"
-            className="object-cover"
+            className={fitClass(post.coverImage?.fit, 'cover')}
             priority
           />
         </div>

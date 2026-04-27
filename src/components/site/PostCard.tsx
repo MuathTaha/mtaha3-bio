@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { urlFor } from '@/sanity/lib/image';
+import { fitClass } from '@/lib/imageFit';
 import type { Post } from '@/types/content';
 
 function formatDate(iso: string) {
@@ -34,7 +35,7 @@ export function PostCard({ post }: { post: Post }) {
               alt={post.coverImage.alt ?? ''}
               fill
               sizes="(max-width: 768px) 100vw, 700px"
-              className="object-cover"
+              className={fitClass(post.coverImage?.fit, 'cover')}
             />
           </div>
         ) : null}

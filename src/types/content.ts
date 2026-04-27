@@ -13,6 +13,7 @@ export type ImageRef = {
   _type: 'image';
   asset: { _ref: string; _type: 'reference' };
   alt?: string;
+  fit?: 'contain' | 'cover';
 };
 
 export type Post = {

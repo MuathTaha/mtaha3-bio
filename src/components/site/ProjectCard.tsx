@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { urlFor } from '@/sanity/lib/image';
+import { fitClass } from '@/lib/imageFit';
 import type { Project } from '@/types/content';
 
 const statusLabel: Record<Project['status'], string> = {
@@ -23,7 +24,7 @@ export function ProjectCard({ project }: { project: Project }) {
       <div className="flex items-start gap-4 border-t border-[var(--color-border)] py-5 transition-colors hover:border-[var(--color-accent)]">
         {project.logo ? (
           <div className="relative h-12 w-12 shrink-0 overflow-hidden bg-[var(--color-bg-elevated)]">
-            <Image src={urlFor(project.logo).width(96).height(96).url()} alt={project.name} fill sizes="48px" />
+            <Image src={urlFor(project.logo).width(96).height(96).url()} alt={project.name} fill sizes="48px" className={fitClass(project.logo?.fit, 'contain')} />
           </div>
         ) : (
           <div className="h-12 w-12 shrink-0 bg-[var(--color-bg-elevated)]" />

@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
 import { urlFor } from '@/sanity/lib/image';
+import { fitClass } from '@/lib/imageFit';
 import type { Experience } from '@/types/content';
 
 export const metadata = { title: 'Work' };
@@ -53,7 +54,7 @@ function ExperienceEntry({ exp }: { exp: Experience }) {
               alt={exp.company}
               fill
               sizes="48px"
-              className="object-contain"
+              className={fitClass(exp.companyLogo?.fit, 'contain')}
             />
           </div>
         ) : null}
