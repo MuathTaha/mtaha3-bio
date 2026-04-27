@@ -15,7 +15,7 @@ export function Nav() {
       <Container measure="wide">
         <nav className="flex items-baseline justify-between gap-8">
           <Link href="/" className="mono text-sm tracking-[0.14em] text-[var(--color-fg)] hover:text-[var(--color-accent)]">
-            @MTAHA3
+            @MTAHA
           </Link>
           <ul className="flex items-baseline gap-6">
             {links.map((l) => (

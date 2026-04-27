@@ -8,7 +8,7 @@ export const siteSettings = defineType({
     defineField({
       name: 'handle',
       type: 'string',
-      initialValue: 'mtaha3',
+      initialValue: 'mtaha',
       validation: (r) => r.required(),
     }),
     defineField({

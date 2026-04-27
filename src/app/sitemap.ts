@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getAllPostSlugs, getAllTags, getProjects } from '@/sanity/lib/queries';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtaha3.bio';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtaha.bio';
   const [slugs, tags, projects] = await Promise.all([
     getAllPostSlugs(),
     getAllTags(),

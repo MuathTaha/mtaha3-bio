@@ -3,7 +3,7 @@ import type { Post } from '@/types/content';
 
 export function buildRssFeed({ posts, siteUrl }: { posts: Post[]; siteUrl: string }): string {
   const feed = new Feed({
-    title: 'Muath Taha — @mtaha3',
+    title: 'Muath Taha — @mtaha',
     description: 'Writing on AI, product, and what I\'m learning.',
     id: siteUrl,
     link: siteUrl,

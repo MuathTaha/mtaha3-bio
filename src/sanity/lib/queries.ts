@@ -74,7 +74,7 @@ export async function getSiteSettings(c: SanityClient = client): Promise<SiteSet
   );
   return (
     result ?? {
-      handle: 'mtaha3',
+      handle: 'mtaha',
       shortBio: '',
     }
   );
