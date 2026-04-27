@@ -1,4 +1,4 @@
-# mtaha3.bio
+# mtaha.bio
 
 Personal blog + CV. Next.js 16 + Sanity + Vercel.
 

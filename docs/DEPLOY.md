@@ -1,4 +1,4 @@
-# Deployment — mtaha3.bio
+# Deployment — mtaha.bio
 
 ## One-time setup
 
@@ -6,7 +6,7 @@
 - Create project at https://sanity.io/manage (already done via `sanity init`).
 - In Studio → API → Tokens: create a read token → `SANITY_API_READ_TOKEN`.
 - In Studio → API → Webhooks: create a webhook:
-  - URL: `https://mtaha3.bio/api/revalidate`
+  - URL: `https://mtaha.bio/api/revalidate`
   - Dataset: production
   - Trigger on: Create, Update, Delete
   - Filter: `_type in ["post","tag","project","siteSettings"]`
@@ -15,8 +15,8 @@
   - Secret: generate and store as `SANITY_WEBHOOK_SECRET`.
 
 ### 2. Resend
-- Sign up at resend.com. Add domain `mtaha3.bio`, add the 3 DNS records Resend shows at Name.com.
-- Create audience "mtaha3.bio readers" → copy ID to `RESEND_AUDIENCE_ID`.
+- Sign up at resend.com. Add domain `mtaha.bio`, add the 3 DNS records Resend shows at Name.com.
+- Create audience "mtaha.bio readers" → copy ID to `RESEND_AUDIENCE_ID`.
 - Create API key → `RESEND_API_KEY`.
 
 ### 3. GitHub
@@ -30,20 +30,19 @@
 - Push repo to GitHub. Import into Vercel. Add all env vars from `.env.local`.
 - Vercel auto-builds on push to main.
 
-### 6. Name.com DNS — mtaha3.bio
+### 6. Name.com DNS — mtaha.bio
 
-| Type  | Host              | Answer                    | TTL |
-|-------|-------------------|---------------------------|-----|
-| A     | mtaha3.bio        | 76.76.21.21               | 300 |
-| CNAME | www.mtaha3.bio    | cname.vercel-dns.com      | 300 |
-| TXT   | *.mtaha3.bio      | (Vercel verification)     | 300 |
-| TXT   | _resend.mtaha3.bio| (Resend SPF/DKIM records) | 300 |
+| Type  | Host             | Answer                    | TTL |
+|-------|------------------|---------------------------|-----|
+| ANAME | mtaha.bio        | cname.vercel-dns.com      | 300 |
+| ANAME | www.mtaha.bio    | cname.vercel-dns.com      | 300 |
+| TXT   | _resend.mtaha.bio| (Resend SPF/DKIM records) | 300 |
 
-In Vercel project → Domains → add `mtaha3.bio` and `www.mtaha3.bio`. Set apex primary; `www` redirects to apex.
+In Vercel project → Domains → add `mtaha.bio` and `www.mtaha.bio`. Set apex primary; `www` redirects to apex.
 
 ## Post-deploy smoke test
 
-- [ ] `https://mtaha3.bio/` returns 200 with valid TLS
+- [ ] `https://mtaha.bio/` returns 200 with valid TLS
 - [ ] `/studio` loads, can edit Site Settings
 - [ ] Create a test post in Studio → publish → appears on home within 10s
 - [ ] `/rss.xml` serves valid XML
