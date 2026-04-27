@@ -44,6 +44,20 @@ export type Project = {
   order: number;
 };
 
+export type Experience = {
+  _id: string;
+  title: string;
+  company: string;
+  companyUrl?: string;
+  companyLogo?: ImageRef;
+  location?: string;
+  startDate: string;
+  endDate?: string;
+  summary?: string;
+  body?: PortableTextBlock[];
+  order?: number;
+};
+
 export type Social = { platform: string; url: string };
 
 export type SiteSettings = {

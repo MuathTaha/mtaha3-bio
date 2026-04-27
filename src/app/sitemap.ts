@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/essays`, lastModified: now, priority: 0.8 },
     { url: `${siteUrl}/notes`, lastModified: now, priority: 0.7 },
     { url: `${siteUrl}/work`, lastModified: now, priority: 0.7 },
+    { url: `${siteUrl}/projects`, lastModified: now, priority: 0.7 },
     { url: `${siteUrl}/about`, lastModified: now, priority: 0.6 },
     { url: `${siteUrl}/search`, lastModified: now, priority: 0.4 },
     ...slugs.map((s) => ({
@@ -28,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     })),
     ...projects.map((p) => ({
-      url: p.writeup ? `${siteUrl}/work/${p.slug}` : `${siteUrl}/work`,
+      url: p.writeup ? `${siteUrl}/projects/${p.slug}` : `${siteUrl}/projects`,
       lastModified: now,
       priority: 0.5,
     })),

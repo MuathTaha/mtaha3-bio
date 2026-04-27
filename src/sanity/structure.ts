@@ -1,5 +1,5 @@
 import type { StructureBuilder } from 'sanity/structure';
-import { CogIcon, DocumentIcon, TagIcon, RocketIcon } from '@sanity/icons';
+import { CogIcon, DocumentIcon, TagIcon, RocketIcon, CaseIcon } from '@sanity/icons';
 
 export const structure = (S: StructureBuilder) =>
   S.list()
@@ -16,5 +16,6 @@ export const structure = (S: StructureBuilder) =>
       S.divider(),
       S.documentTypeListItem('post').title('Posts').icon(DocumentIcon),
       S.documentTypeListItem('tag').title('Tags').icon(TagIcon),
+      S.documentTypeListItem('experience').title('Work — Experience').icon(CaseIcon),
       S.documentTypeListItem('project').title('Projects').icon(RocketIcon),
     ]);

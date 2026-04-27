@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity';
 import type { SanityClient } from 'next-sanity';
 import { client } from './client';
-import type { Post, Project, SiteSettings, Tag } from '@/types/content';
+import type { Experience, Post, Project, SiteSettings, Tag } from '@/types/content';
 
 const POST_FIELDS = groq`
   _id,
@@ -54,6 +54,15 @@ export async function getTagBySlug(slug: string, c: SanityClient = client): Prom
   return c.fetch(
     groq`*[_type == "tag" && slug.current == $slug][0] { _id, name, "slug": slug.current, description }`,
     { slug }
+  );
+}
+
+export async function getExperiences(c: SanityClient = client): Promise<Experience[]> {
+  return c.fetch(
+    groq`*[_type == "experience"] | order(coalesce(order, 0) desc, startDate desc) {
+      _id, title, company, companyUrl, companyLogo, location,
+      startDate, endDate, summary, body, order
+    }`
   );
 }
 
