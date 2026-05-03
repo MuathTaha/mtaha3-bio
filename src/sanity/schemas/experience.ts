@@ -1,4 +1,4 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField, defineArrayMember } from 'sanity';
 
 export const experience = defineType({
   name: 'experience',
@@ -73,7 +73,7 @@ export const experience = defineType({
       title: 'Achievements / details',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'block',
           styles: [
             { title: 'Normal', value: 'normal' },
@@ -94,7 +94,34 @@ export const experience = defineType({
               },
             ],
           },
-        },
+        }),
+        defineArrayMember({
+          type: 'image',
+          title: 'Inline photo',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+              description: 'Shown as caption underneath. Keep it short.',
+            }),
+            defineField({
+              name: 'fit',
+              type: 'string',
+              title: 'Fit',
+              description: 'How the image should fit its display frame.',
+              options: {
+                list: [
+                  { title: 'Contain — fits within frame, no crop', value: 'contain' },
+                  { title: 'Cover — fills frame, may crop', value: 'cover' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'contain',
+            }),
+          ],
+        }),
       ],
     }),
     defineField({

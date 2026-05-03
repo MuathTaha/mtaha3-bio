@@ -1,4 +1,4 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField, defineArrayMember } from 'sanity';
 
 export const project = defineType({
   name: 'project',
@@ -50,7 +50,57 @@ export const project = defineType({
     defineField({
       name: 'writeup',
       type: 'array',
-      of: [{ type: 'block' }],
+      of: [
+        defineArrayMember({
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Section heading', value: 'h3' },
+            { title: 'Quote', value: 'blockquote' },
+          ],
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [{ name: 'href', type: 'url' }],
+              },
+            ],
+          },
+        }),
+        defineArrayMember({
+          type: 'image',
+          title: 'Inline photo',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+              description: 'Shown as caption underneath. Keep it short.',
+            }),
+            defineField({
+              name: 'fit',
+              type: 'string',
+              title: 'Fit',
+              description: 'How the image should fit its display frame.',
+              options: {
+                list: [
+                  { title: 'Contain — fits within frame, no crop', value: 'contain' },
+                  { title: 'Cover — fills frame, may crop', value: 'cover' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'contain',
+            }),
+          ],
+        }),
+      ],
       description: 'Optional — renders at /work/[slug] when present.',
     }),
     defineField({ name: 'year', type: 'string' }),
