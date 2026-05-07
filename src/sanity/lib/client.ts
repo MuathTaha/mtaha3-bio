@@ -1,8 +1,9 @@
 import { createClient } from 'next-sanity';
+import { publicEnv, serverEnv } from '@/lib/env';
 
-export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!;
-export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!;
-export const apiVersion = '2026-04-01';
+export const projectId = publicEnv.NEXT_PUBLIC_SANITY_PROJECT_ID;
+export const dataset = publicEnv.NEXT_PUBLIC_SANITY_DATASET;
+export const apiVersion = publicEnv.NEXT_PUBLIC_SANITY_API_VERSION;
 
 export const client = createClient({
   projectId,
@@ -17,6 +18,6 @@ export const draftClient = createClient({
   dataset,
   apiVersion,
   useCdn: false,
-  token: process.env.SANITY_API_READ_TOKEN,
+  token: serverEnv.SANITY_API_READ_TOKEN,
   perspective: 'previewDrafts',
 });

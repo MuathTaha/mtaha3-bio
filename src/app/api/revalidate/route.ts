@@ -1,9 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { parseBody } from 'next-sanity/webhook';
+import { serverEnv } from '@/lib/env';
 
 export async function POST(req: NextRequest) {
-  const secret = process.env.SANITY_WEBHOOK_SECRET;
+  const secret = serverEnv.SANITY_WEBHOOK_SECRET;
   if (!secret) return NextResponse.json({ error: 'Not configured' }, { status: 500 });
 
   try {

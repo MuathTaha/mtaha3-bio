@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { serverEnv } from '@/lib/env';
 
 const schema = z.object({ email: z.string().email().max(200) });
 
@@ -30,8 +31,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const audienceId = process.env.RESEND_AUDIENCE_ID;
+  const apiKey = serverEnv.RESEND_API_KEY;
+  const audienceId = serverEnv.RESEND_AUDIENCE_ID;
   if (!apiKey || !audienceId) {
     return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
   }
