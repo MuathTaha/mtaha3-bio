@@ -75,6 +75,20 @@ export async function getProjects(c: SanityClient = client): Promise<Project[]> 
   );
 }
 
+export async function getProjectBySlug(slug: string, c: SanityClient = client): Promise<Project | null> {
+  return c.fetch(
+    groq`*[_type == "project" && slug.current == $slug][0] {
+      _id, name, "slug": slug.current, tagline, status, url, repo, logo, year, order,
+      writeup
+    }`,
+    { slug }
+  );
+}
+
+export async function getAllProjectSlugs(c: SanityClient = client): Promise<string[]> {
+  return c.fetch(groq`*[_type == "project" && defined(slug.current)].slug.current`);
+}
+
 export async function getSiteSettings(c: SanityClient = client): Promise<SiteSettings> {
   const result = await c.fetch(
     groq`*[_type == "siteSettings"][0] {
