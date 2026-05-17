@@ -2,6 +2,7 @@ import { groq } from 'next-sanity';
 import type { SanityClient } from 'next-sanity';
 import { client } from './client';
 import type { Experience, Post, Project, SiteSettings, Tag } from '@/types/content';
+import type { Book } from '@/types/book';
 
 const POST_FIELDS = groq`
   _id,
@@ -87,6 +88,16 @@ export async function getProjectBySlug(slug: string, c: SanityClient = client): 
 
 export async function getAllProjectSlugs(c: SanityClient = client): Promise<string[]> {
   return c.fetch(groq`*[_type == "project" && defined(slug.current)].slug.current`);
+}
+
+export const BOOKS_QUERY = groq`
+  *[_type == "book" && !(_id in path("drafts.**"))] {
+    _id, title, author, cover, status, rating, finishedAt, takeaway, order
+  }
+`;
+
+export async function getBooks(c: SanityClient = client): Promise<Book[]> {
+  return c.fetch(BOOKS_QUERY);
 }
 
 export async function getSiteSettings(c: SanityClient = client): Promise<SiteSettings> {
