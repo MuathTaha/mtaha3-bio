@@ -4,5 +4,6 @@ import { tag } from './tag';
 import { project } from './project';
 import { experience } from './experience';
 import { siteSettings } from './siteSettings';
+import { book } from './book';
 
-export const schemaTypes: SchemaTypeDefinition[] = [post, tag, project, experience, siteSettings];
+export const schemaTypes: SchemaTypeDefinition[] = [post, tag, project, experience, siteSettings, book];
