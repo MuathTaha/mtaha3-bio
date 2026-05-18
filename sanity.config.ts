@@ -9,6 +9,7 @@ import { apiVersion, dataset, projectId } from './src/sanity/env';
 import { schemaTypes } from './src/sanity/schemas';
 import { structure } from './src/sanity/structure';
 import { readingTimeAction } from './src/sanity/actions/readingTime';
+import { lookupISBNAction } from './src/sanity/actions/lookupISBN';
 
 const singletons = ['siteSettings'];
 
@@ -39,9 +40,9 @@ export default defineConfig({
       const filtered = singletons.includes(context.schemaType)
         ? input.filter(({ action }) => action && !['duplicate', 'delete'].includes(action))
         : input;
-      return context.schemaType === 'post'
-        ? [...filtered, readingTimeAction]
-        : filtered;
+      if (context.schemaType === 'post') return [...filtered, readingTimeAction];
+      if (context.schemaType === 'book') return [...filtered, lookupISBNAction];
+      return filtered;
     },
   },
 });
