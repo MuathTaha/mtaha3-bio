@@ -22,7 +22,7 @@ test.describe('/books', () => {
 
   test('book cover reveals title on hover', async ({ page }) => {
     await page.goto('/books?status=read');
-    const firstCover = page.locator('ul > li').first();
+    const firstCover = page.locator('ul.grid > li').first();
     await firstCover.hover();
     await expect(firstCover.getByText(/Book$/)).toBeVisible();
   });
