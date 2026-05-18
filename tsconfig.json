@@ -19,8 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@sanity/ui": ["./node_modules/sanity/node_modules/@sanity/ui/dist/index.d.ts"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

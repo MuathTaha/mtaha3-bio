@@ -13,7 +13,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      '@sanity/ui': path.resolve(__dirname, 'node_modules/sanity/node_modules/@sanity/ui/dist/index.js'),
     },
   },
 });
