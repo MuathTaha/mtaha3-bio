@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// Requires seeded dataset: one book per status, with the read book's title
+// ending in "Book" (e.g. "Read Book") so the hover overlay test can locate it.
+
 test.describe('/books', () => {
   test('renders the books page with read tab active by default', async ({ page }) => {
     await page.goto('/books');

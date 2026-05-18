@@ -11,8 +11,6 @@ interface BookCoverProps {
 
 export function BookCover({ book }: BookCoverProps) {
   const [revealed, setRevealed] = useState(false);
-  const showRating = book.status === 'read' && book.rating !== null;
-  const showTakeaway = book.status === 'read' && book.takeaway !== null;
   const firstLetter = book.title.charAt(0).toUpperCase();
 
   return (
@@ -41,10 +39,10 @@ export function BookCover({ book }: BookCoverProps) {
       >
         <p className="font-medium leading-tight line-clamp-2">{book.title}</p>
         <p className="text-xs leading-tight text-white/80 line-clamp-1">{book.author}</p>
-        {showRating && (
-          <p className="mono text-xs text-yellow-300">{'⭐'.repeat(book.rating!)}</p>
+        {book.status === 'read' && book.rating !== null && (
+          <p className="mono text-xs text-yellow-300">{'⭐'.repeat(book.rating)}</p>
         )}
-        {showTakeaway && (
+        {book.status === 'read' && book.takeaway !== null && (
           <p className="text-xs text-white/70 line-clamp-3">{book.takeaway}</p>
         )}
       </div>

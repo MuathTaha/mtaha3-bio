@@ -90,7 +90,7 @@ export async function getAllProjectSlugs(c: SanityClient = client): Promise<stri
   return c.fetch(groq`*[_type == "project" && defined(slug.current)].slug.current`);
 }
 
-export const BOOKS_QUERY = groq`
+const BOOKS_QUERY = groq`
   *[_type == "book" && !(_id in path("drafts.**"))] {
     _id, title, author, cover, status, rating, finishedAt, takeaway, order
   }
