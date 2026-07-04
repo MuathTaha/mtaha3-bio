@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getAllTags, getTagBySlug, getPostsByTag } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { PostList } from '@/components/site/PostList';
 
 export async function generateStaticParams() {
@@ -23,15 +24,7 @@ export default async function TagPage({ params }: { params: Promise<{ slug: stri
   const posts = await getPostsByTag(slug);
   return (
     <Container measure="prose">
-      <header className="mb-8">
-        <p className="mono mb-2 text-xs uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
-          Tag
-        </p>
-        <h1 className="text-3xl font-semibold tracking-tight">{tag.name}</h1>
-        {tag.description ? (
-          <p className="mt-2 text-[var(--color-fg-muted)]">{tag.description}</p>
-        ) : null}
-      </header>
+      <PageHeader kicker="Tag" title={tag.name} lede={tag.description} />
       <PostList posts={posts} emptyLabel="No posts for this tag yet." />
     </Container>
   );

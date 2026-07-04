@@ -21,22 +21,22 @@ export function ProjectCard({ project }: { project: Project }) {
 
   return (
     <Wrapper>
-      <div className="flex items-start gap-4 border-t border-[var(--color-border)] py-5 transition-colors hover:border-[var(--color-accent)]">
+      <div className="group flex items-start gap-4 border-t border-[var(--color-border)] py-6 transition-colors hover:border-[var(--color-accent)]">
         {project.logo ? (
-          <div className="relative h-12 w-12 shrink-0 overflow-hidden bg-[var(--color-bg-elevated)]">
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)]">
             <Image src={urlFor(project.logo).width(96).height(96).url()} alt={project.name} fill sizes="48px" className={fitClass(project.logo?.fit, 'contain')} />
           </div>
         ) : (
-          <div className="h-12 w-12 shrink-0 bg-[var(--color-bg-elevated)]" />
+          <div className="h-12 w-12 shrink-0 rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)]" />
         )}
         <div className="flex-1">
           <div className="flex items-baseline justify-between gap-3">
-            <h3 className="text-lg font-semibold">{project.name}</h3>
-            <span className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--color-fg-faint)]">
+            <h3 className="font-display text-lg font-semibold tracking-tight transition-colors group-hover:text-[var(--color-accent)]">{project.name}</h3>
+            <span className="kicker text-[10px]">
               {statusLabel[project.status]} {project.year ? `· ${project.year}` : ''}
             </span>
           </div>
-          <p className="text-sm text-[var(--color-fg-muted)]">{project.tagline}</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--color-fg-muted)]">{project.tagline}</p>
         </div>
       </div>
     </Wrapper>

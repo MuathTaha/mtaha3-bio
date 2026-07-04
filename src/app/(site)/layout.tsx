@@ -6,7 +6,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Nav />
-      <main className="min-h-[60vh] py-12">{children}</main>
+      <main className="min-h-[60vh] py-14 sm:py-20">{children}</main>
       <Footer />
     </>
   );

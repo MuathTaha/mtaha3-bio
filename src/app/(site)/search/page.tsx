@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { sendGAEvent } from '@next/third-parties/google';
 import { buildSearcher, type SearchItem } from '@/lib/search';
 import { Container } from '@/components/ui/Container';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export default function SearchPage() {
   const [q, setQ] = useState('');
@@ -25,13 +26,13 @@ export default function SearchPage() {
 
   return (
     <Container measure="prose">
-      <h1 className="mb-6 text-3xl font-semibold tracking-tight">Search</h1>
+      <PageHeader kicker="Find" title="Search" />
       <input
         autoFocus
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search posts…"
-        className="mb-8 w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-3 text-base text-[var(--color-fg)] placeholder:text-[var(--color-fg-faint)] focus:border-[var(--color-accent)] focus:outline-none"
+        className="mb-8 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-3 text-base text-[var(--color-fg)] transition-colors placeholder:text-[var(--color-fg-faint)] focus:border-[var(--color-accent)] focus:outline-none"
       />
       {items === null ? (
         <p className="mono text-xs uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">Loading…</p>
@@ -44,7 +45,7 @@ export default function SearchPage() {
                   <span>{h.publishedAt.slice(0, 10)}</span>
                   <span>{h.type}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--color-fg)] hover:text-[var(--color-accent)]">{h.title}</h3>
+                <h3 className="font-display text-lg font-semibold tracking-tight text-[var(--color-fg)] transition-colors hover:text-[var(--color-accent)]">{h.title}</h3>
                 <p className="text-sm text-[var(--color-fg-muted)]">{h.excerpt}</p>
               </Link>
             </li>

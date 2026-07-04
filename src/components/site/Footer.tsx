@@ -7,24 +7,32 @@ export async function Footer() {
   const settings = await getSiteSettings();
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-24 border-t border-[var(--color-border)] py-10 text-sm text-[var(--color-fg-muted)]">
-      <Container measure="wide">
-        <div className="grid gap-10 md:grid-cols-2">
+    <footer className="mt-28 border-t border-[var(--color-border)]">
+      <Container measure="wide" className="py-14">
+        <div className="grid gap-12 md:grid-cols-2">
           <div>
-            <p className="max-w-md">{settings.shortBio}</p>
+            <p className="font-display text-lg font-semibold tracking-tight">Muath Taha</p>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--color-fg-muted)]">
+              {settings.shortBio}
+            </p>
           </div>
-          <div className="max-w-sm md:justify-self-end">
+          <div className="max-w-sm md:justify-self-end md:text-left">
             <NewsletterForm cta={settings.newsletterCta ?? 'Get new posts in your inbox.'} />
           </div>
         </div>
-        <div className="mt-10 flex flex-wrap items-baseline justify-between gap-6 border-t border-[var(--color-border)] pt-6">
-          <div className="flex gap-4">
-            <Link href="/rss.xml" className="mono text-xs uppercase tracking-[0.12em] hover:text-[var(--color-fg)]">RSS</Link>
+        <div className="mt-12 flex flex-wrap items-baseline justify-between gap-6 border-t border-[var(--color-border)] pt-6">
+          <div className="flex flex-wrap gap-5">
+            <Link
+              href="/rss.xml"
+              className="mono text-xs uppercase tracking-[0.12em] text-[var(--color-fg-dim)] transition-colors hover:text-[var(--color-accent)]"
+            >
+              RSS
+            </Link>
             {settings.socials?.map((s) => (
               <a
                 key={s.platform}
                 href={s.url}
-                className="mono text-xs uppercase tracking-[0.12em] hover:text-[var(--color-fg)]"
+                className="mono text-xs uppercase tracking-[0.12em] text-[var(--color-fg-dim)] transition-colors hover:text-[var(--color-accent)]"
                 target="_blank"
                 rel="noreferrer noopener"
               >
@@ -32,9 +40,7 @@ export async function Footer() {
               </a>
             ))}
           </div>
-          <p className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--color-fg-faint)]">
-            © {year} Muath Taha
-          </p>
+          <p className="kicker text-[10px]">© {year} Muath Taha</p>
         </div>
       </Container>
     </footer>

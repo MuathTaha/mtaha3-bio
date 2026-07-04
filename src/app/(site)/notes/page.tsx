@@ -1,5 +1,6 @@
 import { getPosts } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { PostList } from '@/components/site/PostList';
 
 export const metadata = { title: 'Notes' };
@@ -9,7 +10,11 @@ export default async function NotesPage() {
   const posts = await getPosts(100, 'note');
   return (
     <Container measure="prose">
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Notes</h1>
+      <PageHeader
+        kicker="Writing"
+        title="Notes"
+        lede="Short, rough, and current — thinking out loud."
+      />
       <PostList posts={posts} emptyLabel="No notes published yet." />
     </Container>
   );

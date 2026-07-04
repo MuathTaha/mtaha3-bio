@@ -15,7 +15,7 @@ export function BookCover({ book }: BookCoverProps) {
 
   return (
     <div
-      className="group relative aspect-[2/3] overflow-hidden rounded-sm bg-[var(--color-bg-elev)]"
+      className="group relative aspect-[2/3] overflow-hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)] transition-colors hover:border-[var(--color-border-strong)]"
       onClick={() => setRevealed((v) => !v)}
     >
       {book.cover ? (
@@ -33,7 +33,7 @@ export function BookCover({ book }: BookCoverProps) {
       )}
 
       <div
-        className={`absolute inset-0 flex flex-col justify-end gap-1 bg-black/75 p-3 text-[var(--color-bg)] transition-opacity ${
+        className={`absolute inset-0 flex flex-col justify-end gap-1 bg-black/80 p-3 text-white transition-opacity ${
           revealed ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
         }`}
       >

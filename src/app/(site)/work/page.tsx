@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { getExperiences } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
 import { urlFor } from '@/sanity/lib/image';
@@ -23,12 +24,11 @@ export default async function WorkPage() {
 
   return (
     <Container measure="prose">
-      <header className="mb-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Work</h1>
-        <p className="mt-2 text-[var(--color-fg-muted)]">
-          My professional career — the places, the work, the impact.
-        </p>
-      </header>
+      <PageHeader
+        kicker="Career"
+        title="Work"
+        lede="My professional career — the places, the work, the impact."
+      />
 
       {experiences.length === 0 ? (
         <p className="text-[var(--color-fg-muted)]">No entries yet.</p>
@@ -59,7 +59,7 @@ function ExperienceEntry({ exp }: { exp: Experience }) {
           </div>
         ) : null}
         <div className="flex-1">
-          <h2 className="text-xl font-semibold leading-tight text-[var(--color-fg)]">
+          <h2 className="font-display text-xl font-semibold leading-tight tracking-tight text-[var(--color-fg)]">
             {exp.title}
           </h2>
           <p className="mono mt-1 text-xs uppercase tracking-[0.12em] text-[var(--color-fg-muted)]">

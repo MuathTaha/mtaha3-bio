@@ -2,22 +2,24 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* Core palette — dark editorial */
-  --color-bg:            #0e0e10;
-  --color-bg-elevated:   #17171a;
-  --color-border:        #2a2a2e;
-  --color-fg:            #f5f2ea;
-  --color-fg-muted:      #c7c5bd;
-  --color-fg-dim:        #9a9aa0;
-  --color-fg-faint:      #6a6a70;
-  --color-accent:        #e8b04a;      /* warm gold */
-  --color-accent-strong: #d9961f;
-  --color-danger:        #dc2626;
+  /* Core palette — dark editorial, warm ink */
+  --color-bg:            #0a0a0c;
+  --color-bg-elevated:   #131316;
+  --color-bg-hover:      #1a1a1e;
+  --color-border:        #232328;
+  --color-border-strong: #3a3a42;
+  --color-fg:            #f2efe6;
+  --color-fg-muted:      #b8b6ad;
+  --color-fg-dim:        #8e8e95;
+  --color-fg-faint:      #63636b;
+  --color-accent:        #e2a63d;      /* warm gold */
+  --color-accent-strong: #f0be62;
+  --color-danger:        #e05252;
 
-  /* Typography */
-  --font-sans:   "Söhne", ui-sans-serif, system-ui, sans-serif;
-  --font-serif:  "Söhne Breit", "Iowan Old Style", Georgia, serif;
-  --font-mono:   "Söhne Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Typography — wired to next/font variables set on <html> */
+  --font-sans:    var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-mono:    var(--font-jbmono), ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Content */
   --measure-narrow: 32rem;
@@ -30,15 +32,49 @@ html {
   color: var(--color-fg);
   font-family: var(--font-sans);
   color-scheme: dark;
+  scrollbar-gutter: stable;
 }
 
 body {
-  font-feature-settings: "ss01" on, "ss02" on, "cv11" on;
+  font-feature-settings: "ss01" on, "cv11" on;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Faint gold glow behind the top of every page */
+body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42rem 22rem at 50% -8rem, rgb(226 166 61 / 0.07), transparent 70%);
+}
+
 .mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+
+/* Small-caps mono label used for dates, section markers, nav */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-fg-faint);
+}
+
+/* Display serif for headings */
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 72;
+}
 
 /* Selection */
 ::selection { background: var(--color-accent); color: var(--color-bg); }
+
+/* Keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}

@@ -1,5 +1,6 @@
 import { getSiteSettings } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
 import { CVDownloadButton } from '@/components/site/CVDownloadButton';
@@ -25,8 +26,7 @@ export default async function AboutPage() {
           }),
         }}
       />
-      <h1 className="mb-4 text-3xl font-semibold tracking-tight">About</h1>
-      <p className="mb-8 text-lg text-[var(--color-fg-muted)]">{settings.shortBio}</p>
+      <PageHeader kicker="Who I am" title="About" lede={settings.shortBio} />
       {settings.longBio ? (
         <Prose>
           <PortableText value={settings.longBio} />

@@ -7,7 +7,7 @@ test.describe('/books', () => {
   test('renders the books page with read tab active by default', async ({ page }) => {
     await page.goto('/books');
     await expect(page.getByRole('heading', { name: 'Books' })).toBeVisible();
-    const readTab = page.getByRole('button', { name: /^Read/ });
+    const readTab = page.getByRole('button', { name: /^Read \(/ });
     await expect(readTab).toHaveAttribute('aria-current', 'page');
   });
 

@@ -43,12 +43,12 @@ export function NewsletterForm({ cta }: { cta: string }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@domain.com"
-          className="flex-1 border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-2 text-sm focus:border-[var(--color-accent)] focus:outline-none"
+          className="flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-2 text-sm transition-colors placeholder:text-[var(--color-fg-faint)] focus:border-[var(--color-accent)] focus:outline-none"
         />
         <button
           type="submit"
           disabled={state === 'loading'}
-          className="mono border border-[var(--color-accent)] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] disabled:opacity-50"
+          className="mono rounded-sm border border-[var(--color-accent)] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] disabled:opacity-50"
         >
           {state === 'loading' ? '…' : 'Subscribe'}
         </button>

@@ -35,9 +35,12 @@ export function BooksPage({ books }: BooksPageProps) {
 
   return (
     <section>
-      <h1 className="mono mb-6 text-xs uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
-        Books
-      </h1>
+      <header className="mb-10">
+        <p className="kicker mb-3">Reading</p>
+        <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+          Books
+        </h1>
+      </header>
       <BookTabs active={active} counts={counts} />
       <BookGrid books={buckets[active]} emptyMessage={EMPTY[active]} />
     </section>

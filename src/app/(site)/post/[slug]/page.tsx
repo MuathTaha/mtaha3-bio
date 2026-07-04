@@ -64,9 +64,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           }),
         }}
       />
-      <header className="mb-8">
-        <div className="mono mb-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
-          <span>{new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '·')}</span>
+      <header className="mb-10">
+        <div className="kicker mb-5 flex items-center gap-3">
+          <span>{new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
           <span className="h-1 w-1 rounded-full bg-[var(--color-fg-faint)]" />
           <span>{post.type}</span>
           {post.readingTime ? (
@@ -76,11 +76,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </>
           ) : null}
         </div>
-        <h1 className="text-4xl font-semibold leading-tight tracking-tight">{post.title}</h1>
-        <p className="mt-4 text-lg text-[var(--color-fg-muted)]">{post.excerpt}</p>
+        <h1 className="font-display text-4xl font-semibold leading-[1.08] tracking-tight text-balance sm:text-5xl">
+          {post.title}
+        </h1>
+        <p className="mt-5 text-lg leading-relaxed text-[var(--color-fg-muted)]">{post.excerpt}</p>
       </header>
       {post.coverImage ? (
-        <div className="relative mb-10 aspect-[16/7] w-full overflow-hidden">
+        <div className="relative mb-12 aspect-[16/7] w-full overflow-hidden rounded-sm border border-[var(--color-border)]">
           <Image
             src={urlFor(post.coverImage).width(1400).url()}
             alt={post.coverImage.alt ?? ''}
