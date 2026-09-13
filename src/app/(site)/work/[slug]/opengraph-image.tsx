@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { getProjectBySlug } from '@/sanity/lib/queries';
 
 export const runtime = 'nodejs';
-export const alt = 'mtaha.bio project';
+export const alt = 'mtaha3.bio project';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -15,7 +15,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function ProjectOgImage({ params }: { params: { slug: string } }) {
   const project = await getProjectBySlug(params.slug);
-  const title = project?.name ?? 'mtaha.bio';
+  const title = project?.name ?? 'mtaha3.bio';
   const tagline = project?.tagline ?? '';
   const status = project?.status ? STATUS_LABEL[project.status] ?? '' : '';
   const year = project?.year ?? '';
@@ -47,7 +47,7 @@ export default async function ProjectOgImage({ params }: { params: { slug: strin
             color: '#7a6d5c',
           }}
         >
-          <span>mtaha.bio · work</span>
+          <span>mtaha3.bio · work</span>
           {status ? (
             <>
               <span style={{ display: 'inline-block', width: 4, height: 4, borderRadius: 2, background: '#bfb39e' }} />

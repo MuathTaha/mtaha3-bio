@@ -2,13 +2,13 @@ import { ImageResponse } from 'next/og';
 import { getPostBySlug } from '@/sanity/lib/queries';
 
 export const runtime = 'nodejs';
-export const alt = 'mtaha.bio post';
+export const alt = 'mtaha3.bio post';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function PostOgImage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
-  const title = post?.title ?? 'mtaha.bio';
+  const title = post?.title ?? 'mtaha3.bio';
   const excerpt = post?.excerpt ?? '';
   const type = post?.type ?? '';
   const date = post?.publishedAt
@@ -46,7 +46,7 @@ export default async function PostOgImage({ params }: { params: { slug: string }
             color: '#7a6d5c',
           }}
         >
-          <span>mtaha.bio</span>
+          <span>mtaha3.bio</span>
           {type ? (
             <>
               <span style={{ display: 'inline-block', width: 4, height: 4, borderRadius: 2, background: '#bfb39e' }} />

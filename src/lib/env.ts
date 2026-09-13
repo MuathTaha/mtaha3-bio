@@ -12,7 +12,7 @@ const publicSchema = z.object({
   NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1, 'NEXT_PUBLIC_SANITY_PROJECT_ID is required'),
   NEXT_PUBLIC_SANITY_DATASET:    z.string().default('production'),
   NEXT_PUBLIC_SANITY_API_VERSION: z.string().default('2026-04-25'),
-  NEXT_PUBLIC_SITE_URL:          z.string().url().default('https://mtaha.bio'),
+  NEXT_PUBLIC_SITE_URL:          z.string().url().default('https://mtaha3.bio'),
   NEXT_PUBLIC_GA_ID:             z.string().optional(),
   NEXT_PUBLIC_GISCUS_REPO:       z.string().optional(),
   NEXT_PUBLIC_GISCUS_REPO_ID:    z.string().optional(),

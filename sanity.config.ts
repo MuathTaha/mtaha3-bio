@@ -15,7 +15,7 @@ const singletons = ['siteSettings'];
 
 export default defineConfig({
   name: 'default',
-  title: 'mtaha.bio',
+  title: 'mtaha3.bio',
   basePath: '/studio',
   projectId,
   dataset,

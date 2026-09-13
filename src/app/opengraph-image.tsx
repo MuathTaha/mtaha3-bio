@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { getSiteSettings } from '@/sanity/lib/queries';
 
 export const runtime = 'nodejs';
-export const alt = 'mtaha.bio — Muath Taha';
+export const alt = 'mtaha3.bio — Muath Taha';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -34,7 +34,7 @@ export default async function SiteOgImage() {
             color: '#7a6d5c',
           }}
         >
-          mtaha.bio
+          mtaha3.bio
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>

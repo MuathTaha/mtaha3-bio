@@ -7,7 +7,7 @@ import { BooksPage } from '@/components/site/BooksPage';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Books — mtaha.bio',
+  title: 'Books — mtaha3.bio',
   description: "What I'm reading and what I've finished.",
 };
 
