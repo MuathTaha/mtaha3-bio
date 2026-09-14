@@ -107,7 +107,7 @@ export default async function ProjectOgImage({ params }: { params: { slug: strin
           }}
         >
           <span>Muath Taha</span>
-          <span style={{ color: '#c9a64a' }}>@mtaha</span>
+          <span style={{ color: '#c9a64a' }}>@mtaha3</span>
         </div>
       </div>
     ),

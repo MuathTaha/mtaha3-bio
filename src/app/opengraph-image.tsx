@@ -75,7 +75,7 @@ export default async function SiteOgImage() {
           }}
         >
           <span>Personal site · Essays · Work</span>
-          <span style={{ color: '#c9a64a' }}>@mtaha</span>
+          <span style={{ color: '#c9a64a' }}>@mtaha3</span>
         </div>
       </div>
     ),

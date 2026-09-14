@@ -106,7 +106,7 @@ export default async function PostOgImage({ params }: { params: { slug: string }
           }}
         >
           <span>Muath Taha</span>
-          <span style={{ color: '#c9a64a' }}>@mtaha</span>
+          <span style={{ color: '#c9a64a' }}>@mtaha3</span>
         </div>
       </div>
     ),
