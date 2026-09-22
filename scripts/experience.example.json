@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Senior Product Manager",
+    "company": "Acme AI",
+    "companyUrl": "https://acme.example.com",
+    "location": "Dubai, UAE",
+    "startDate": "2024-03",
+    "summary": "Leads the applied-LLM product line, taking it from internal prototype to general availability.",
+    "achievements": [
+      "Shipped three major releases in twelve months, growing weekly active usage 4x.",
+      "Built the evaluation harness the team now uses to gate every model change.",
+      "Hired and onboarded four engineers into the platform group."
+    ]
+  },
+  {
+    "title": "Product Manager",
+    "company": "Northwind",
+    "location": "Toronto, Canada",
+    "startDate": "2021-06",
+    "endDate": "2024-02",
+    "summary": "Owned growth and onboarding for a self-serve B2B product.",
+    "achievements": [
+      "Rebuilt onboarding, lifting activation from 31% to 52%.",
+      "Introduced weekly experiment reviews across three squads."
+    ]
+  }
+]
