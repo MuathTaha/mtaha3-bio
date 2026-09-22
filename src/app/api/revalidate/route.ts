@@ -30,9 +30,18 @@ export async function POST(req: NextRequest) {
       revalidatePath('/api/search-index');
     } else if (type === 'tag' && slug) {
       revalidatePath(`/tag/${slug}`, 'page');
-    } else if (type === 'project' || type === 'siteSettings') {
+    } else if (type === 'project') {
+      // Projects are listed on /projects; those with a writeup also render at /work/[slug].
+      revalidatePath('/projects', 'page');
+      if (slug) revalidatePath(`/work/${slug}`, 'page');
+    } else if (type === 'experience') {
       revalidatePath('/work', 'page');
-      revalidatePath('/about', 'page');
+    } else if (type === 'book') {
+      revalidatePath('/books', 'page');
+    } else if (type === 'siteSettings') {
+      // The bio and socials feed the footer on every page, plus the home hero
+      // and About, so refresh the whole tree under the root layout.
+      revalidatePath('/', 'layout');
     }
 
     return NextResponse.json({ revalidated: true, type, slug });

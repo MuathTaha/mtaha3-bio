@@ -9,7 +9,9 @@
   - URL: `https://mtaha3.bio/api/revalidate`
   - Dataset: production
   - Trigger on: Create, Update, Delete
-  - Filter: `_type in ["post","tag","project","siteSettings"]`
+  - Filter: `_type in ["post","tag","project","siteSettings","experience","book"]`
+    (any type left out of this filter never reaches `/api/revalidate`, so edits to it
+    only appear on the next 60-second revalidate rather than immediately)
   - Projection: `{ _type, slug }`
   - HTTP method: POST
   - Secret: generate and store as `SANITY_WEBHOOK_SECRET`.
