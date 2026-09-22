@@ -11,6 +11,8 @@ export type Tag = {
 
 export type ImageRef = {
   _type: 'image';
+  /** Present when the image is a member of an array field, e.g. a photo gallery. */
+  _key?: string;
   asset: { _ref: string; _type: 'reference' };
   alt?: string;
   fit?: 'contain' | 'cover';
@@ -56,6 +58,7 @@ export type Experience = {
   endDate?: string;
   summary?: string;
   body?: PortableTextBlock[];
+  photos?: ImageRef[];
   order?: number;
 };
 

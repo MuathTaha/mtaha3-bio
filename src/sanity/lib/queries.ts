@@ -62,7 +62,7 @@ export async function getExperiences(c: SanityClient = client): Promise<Experien
   return c.fetch(
     groq`*[_type == "experience"] | order(coalesce(order, 0) desc, startDate desc) {
       _id, title, company, companyUrl, companyLogo, location,
-      startDate, endDate, summary, body, order
+      startDate, endDate, summary, body, photos, order
     }`
   );
 }

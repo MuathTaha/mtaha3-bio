@@ -125,6 +125,27 @@ export const experience = defineType({
       ],
     }),
     defineField({
+      name: 'photos',
+      title: 'Photos',
+      description: 'Snapshots from this role — shown as a gallery under the details.',
+      type: 'array',
+      options: { layout: 'grid' },
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Caption / alt text',
+              description: 'Shown under the photo and read out by screen readers. Keep it short.',
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
       name: 'order',
       type: 'number',
       description: 'Manual sort override. Higher = appears first. Leave blank to sort by startDate desc.',

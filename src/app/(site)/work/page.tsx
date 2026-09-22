@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
+import { ExperiencePhotos } from '@/components/site/ExperiencePhotos';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import type { Experience } from '@/types/content';
@@ -92,6 +93,8 @@ function ExperienceEntry({ exp }: { exp: Experience }) {
           <PortableText value={exp.body} />
         </Prose>
       ) : null}
+
+      {exp.photos?.length ? <ExperiencePhotos photos={exp.photos} /> : null}
     </article>
   );
 }
