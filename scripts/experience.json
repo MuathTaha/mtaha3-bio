@@ -1,0 +1,79 @@
+[
+  {
+    "title": "Enterprise Digital Performance SME (Strategic Workforce Planning)",
+    "company": "SLB",
+    "companyUrl": "https://www.slb.com",
+    "location": "Paris, France",
+    "startDate": "2024-03",
+    "summary": "Digital transformation of strategic workforce planning at division HQ — machine-learning forecasting, preventive maintenance analytics, and the data infrastructure that makes them work.",
+    "achievements": [
+      "Drive the digital transformation of strategic workforce planning for a global division, acting as focal point to the Division HR Director and advisor to divisional stakeholders on digital performance topics.",
+      "Lead the design and deployment of machine-learning headcount demand forecasting tied to activity and revenue, taking the use case from ideation and prototyping through to adoption in financial planning cycles.",
+      "Designed the concept for an ML-based preventive maintenance tool for field equipment: standardized the failure-investigation process flow across different tool types, each with its own way of working, and mapped them to the electronic boards where temperature and pressure degradation is sensed — using internal board sensors as the design differentiator.",
+      "Solved the data problem behind it: five years of historical failure data that mostly had to be computed to exist, plus upgrades to acquisition software and real-time transmission through our remote-operations infrastructure to the virtual processing unit hosting the ML model, so failures are detected live during acquisition instead of after the fact.",
+      "Design activity-to-headcount demand metrics and analytics products (Power BI / DAX fact models) integrating multiple enterprise source systems, giving leadership forward visibility on resourcing demand.",
+      "Develop KPOs and KPIs standardizing governance of workforce planning and performance across geographic units, and monitor implementation risks with mitigation measures.",
+      "Coordinate location workforce managers across the division through financial planning and execution cycles, aligning digital initiatives with budget and strategic objectives."
+    ]
+  },
+  {
+    "title": "Field Development & Engagement Manager",
+    "company": "SLB",
+    "companyUrl": "https://www.slb.com",
+    "location": "MENA — Oman & Pakistan",
+    "startDate": "2022-10",
+    "endDate": "2024-03",
+    "summary": "People strategy for an 800-person GeoUnit across Oman and Pakistan during a period of rapid expansion, pairing organizational design with digital tools that carried measurable ROI.",
+    "achievements": [
+      "Primary point of contact for people planning, development, and performance across the GeoUnit (800 headcount); led a team of two HRBPs and three staffing coordinators while holding dual GeoUnit and HQ strategic roles.",
+      "Led workforce strategy through rapid expansion: 21% topline growth, ~1,000 bps IBT improvement, and three consecutive injury-free years.",
+      "Built digital fleet deployment tools for sub-business-line managers that saved three headcounts per fleet and improved employee utilization by ~250 bps per fleet — a digital solution with direct, measured ROI.",
+      "Reviewed organization structures across three business lines, identifying 7% underutilized capability and improving organizational effectiveness by 3%; achieved 50% reduction in CMSr through operational optimization.",
+      "Resolved contractor onboarding misalignments, saving $1.5K per contractor, and published service-delivery metrics that lifted the employee engagement index."
+    ]
+  },
+  {
+    "title": "Workforce Coordinator",
+    "company": "SLB",
+    "companyUrl": "https://www.slb.com",
+    "location": "MENA — Oman & Pakistan",
+    "startDate": "2021-04",
+    "endDate": "2022-10",
+    "summary": "Workforce analytics and staffing for 815 people across six sub-segments, supporting delivery on Shell and BP awarded contracts.",
+    "achievements": [
+      "Delivered quarterly compensation, utilization, and gap analytics for 815 personnel across six sub-segments; introduced a bi-weekly balanced scorecard improving real-time decision-making by 17%.",
+      "Used PMO tools to track projects against milestones and KPIs, proactively flagging risks and mitigation measures to the Division Manager.",
+      "Led four recruiting specialists to close 87% of staffing gaps on Shell and BP awarded contracts; cut time-to-autonomy 19% and Time-to-Full-Autonomy 13% YoY through data-driven training redesign.",
+      "Drove cross-functional multi-skilling of fleet crews, delivering 11% compensation deployment savings."
+    ]
+  },
+  {
+    "title": "Remote Operations Lead",
+    "company": "SLB",
+    "companyUrl": "https://www.slb.com",
+    "location": "Oman",
+    "startDate": "2019-03",
+    "endDate": "2021-04",
+    "summary": "End-to-end delivery of a digital operating model: business case, prototype, then roll-out beyond Oman to four more countries. Recognized with a letter from SLB's CEO.",
+    "achievements": [
+      "Spearheaded the commercialization of the Muscat Remote Operations Center, a digital operating model replacing on-site presence: diagnosed the previous showstoppers and delivered hands-on solutions to managing directors. Recognized with a letter from SLB's CEO.",
+      "Led client engagement and change management for remote-operations adoption, then scaled coverage beyond Oman to Egypt, Kuwait, Australia, and Malaysia.",
+      "Managed 8 engineers on a 24/7/365 model; built KPI-based procedures identifying strategic fleets to maximize coverage of critical service demand.",
+      "Analyzed center performance and customer satisfaction, driving continuous improvement of systems and processes; PDO Shukran Award 2021 for excellent and safe deployment of remote operations."
+    ]
+  },
+  {
+    "title": "Field Engineer → Engineer in Charge, Wireline",
+    "company": "SLB",
+    "companyUrl": "https://www.slb.com",
+    "location": "Oman",
+    "startDate": "2012-03",
+    "endDate": "2019-03",
+    "summary": "Seven years in the field — wireline exploration services for PDO/Shell, Occidental Petroleum and Petrogas, and first deployments of new SLB technologies.",
+    "achievements": [
+      "Led wireline exploration services for PDO/Shell, Occidental Petroleum, and Petrogas; handpicked by PDO–Shell as lead engineer for fluid sampling and rock coring services.",
+      "Selected to introduce emerging SLB technologies (NT-1/NT-5 new-technology deployments): Saturn 12.25″ fluid sampling, NMR logging in fiberglass casing, low-pressure tubing cutters.",
+      "Increased operational productivity 19% on exploration services; led 6+ engineers and 30+ operators with a continuous-improvement culture."
+    ]
+  }
+]
