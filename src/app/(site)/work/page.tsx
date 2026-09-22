@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { draftMode } from 'next/headers';
 import { getExperiences } from '@/sanity/lib/queries';
 import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -9,7 +11,21 @@ import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import type { Experience } from '@/types/content';
 
-export const metadata = { title: 'Work' };
+export const metadata = {
+  title: 'Work',
+  // Unlisted while the content is being simplified — keep it out of search
+  // results even if the URL leaks.
+  robots: { index: false, follow: false },
+};
+
+/**
+ * Temporarily unlisted: the page 404s for the public and is only rendered with
+ * draft mode on (enable it via /api/preview?secret=…). To publish it again,
+ * delete this flag and the guard below, restore the nav link in Nav.tsx and the
+ * sitemap entry in sitemap.ts.
+ */
+const PUBLISHED = false;
+
 export const revalidate = 60;
 
 function formatRange(start: string, end?: string): string {
@@ -21,6 +37,9 @@ function formatRange(start: string, end?: string): string {
 }
 
 export default async function WorkPage() {
+  const { isEnabled: isDraft } = await draftMode();
+  if (!PUBLISHED && !isDraft) notFound();
+
   const experiences = await getExperiences();
 
   return (

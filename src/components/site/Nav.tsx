@@ -10,7 +10,8 @@ const links = [
   { href: '/essays', label: 'Essays' },
   { href: '/notes', label: 'Notes' },
   { href: '/books', label: 'Books' },
-  { href: '/work', label: 'Work' },
+  // '/work' is temporarily unlisted while its content is simplified — see
+  // the PUBLISHED flag in app/(site)/work/page.tsx.
   { href: '/projects', label: 'Projects' },
   { href: '/about', label: 'About' },
   { href: '/search', label: 'Search' },
