@@ -62,7 +62,10 @@ export async function getExperiences(c: SanityClient = client): Promise<Experien
   return c.fetch(
     groq`*[_type == "experience"] | order(coalesce(order, 0) desc, startDate desc) {
       _id, title, company, companyUrl, companyLogo, location,
-      startDate, endDate, summary, body, photos, order
+      startDate, endDate, summary, body, order,
+      // Empty slots from the Studio's grid uploader have no asset and break
+      // image URL building, so never hand them to the renderer.
+      "photos": photos[defined(asset)]
     }`
   );
 }
