@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/essays`, lastModified: now, priority: 0.8 },
     { url: `${siteUrl}/notes`, lastModified: now, priority: 0.7 },
     { url: `${siteUrl}/books`, lastModified: now, priority: 0.7 },
-    // '/work' is deliberately absent while unlisted — see work/page.tsx.
+    { url: `${siteUrl}/work`, lastModified: now, priority: 0.7 },
     { url: `${siteUrl}/projects`, lastModified: now, priority: 0.7 },
     { url: `${siteUrl}/about`, lastModified: now, priority: 0.6 },
     { url: `${siteUrl}/search`, lastModified: now, priority: 0.4 },
