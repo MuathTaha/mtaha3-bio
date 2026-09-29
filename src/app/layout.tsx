@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 const inter = Inter({
@@ -37,6 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}>
       <body>
         {children}
+        {/*
+          Vercel Web Analytics. In production the script and its beacon are
+          served same-origin (/_vercel/insights/…), so the CSP's 'self' already
+          covers it; only the dev-only debug script comes from a Vercel host.
+        */}
+        <Analytics />
+        {/* GA4 only loads when NEXT_PUBLIC_GA_ID is set in the environment. */}
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>

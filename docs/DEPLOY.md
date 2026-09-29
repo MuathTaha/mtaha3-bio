@@ -25,8 +25,19 @@
 - Create public repo `mtaha3/mtaha3-comments`. Settings → Features → Enable Discussions.
 - Visit https://giscus.app, paste repo, pick the "General" category. Copy `data-repo-id` and `data-category-id` to `NEXT_PUBLIC_GISCUS_REPO_ID` / `NEXT_PUBLIC_GISCUS_CATEGORY_ID`.
 
-### 4. Google Analytics
-- Create GA4 property at analytics.google.com. Copy Measurement ID (G-XXXXX) to `NEXT_PUBLIC_GA_ID`.
+### 4. Analytics
+
+Two are wired up, and each needs a step outside the code:
+
+- **Google Analytics 4** — create a GA4 property at analytics.google.com and put the
+  Measurement ID (G-XXXXX) in `NEXT_PUBLIC_GA_ID`. Without that variable the tag
+  never renders and nothing is tracked. GA4 sets cookies, so an EU audience needs a
+  consent banner. Custom events already sent: `newsletter_signup`, `cv_download`,
+  and `search` (with the search term).
+- **Vercel Web Analytics** — installing `@vercel/analytics` is not enough; turn it on
+  in the Vercel project under Analytics. Cookieless, so no consent banner. In
+  production its script and beacon are same-origin under `/_vercel/insights/`, which
+  the CSP's `'self'` already allows — no CSP change needed.
 
 ### 5. Vercel
 - Push repo to GitHub. Import into Vercel. Add all env vars from `.env.local`.
