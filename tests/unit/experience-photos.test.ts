@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { withAsset } from '@/components/site/ExperiencePhotos';
+import { hasAsset, withAsset } from '@/lib/imageRef';
 import type { ImageRef } from '@/types/content';
 
 const withRef = (key: string): ImageRef => ({
@@ -8,25 +8,37 @@ const withRef = (key: string): ImageRef => ({
   asset: { _ref: `image-${key}-100x100-jpg`, _type: 'reference' },
 });
 
-/** What the Studio writes when an item is added to the grid but no file picked. */
-const emptySlot = { _type: 'image', _key: 'empty' } as unknown as ImageRef;
+/** What the Studio writes when an image field is added but no file is picked. */
+const emptySlot = { _type: 'image' } as unknown as ImageRef;
 
-describe('withAsset', () => {
-  it('drops entries with no asset, which would otherwise crash the build', () => {
-    expect(withAsset([withRef('a'), emptySlot, withRef('b')]).map((p) => p._key)).toEqual(['a', 'b']);
+describe('hasAsset', () => {
+  it('accepts an image with a real asset reference', () => {
+    expect(hasAsset(withRef('a'))).toBe(true);
   });
 
-  it('keeps every entry when all have assets', () => {
-    const photos = [withRef('a'), withRef('b')];
-    expect(withAsset(photos)).toEqual(photos);
+  it.each([
+    ['an empty image object', emptySlot],
+    ['an asset object with no _ref', { _type: 'image', asset: {} }],
+    ['an empty _ref string', { _type: 'image', asset: { _ref: '' } }],
+    ['undefined', undefined],
+    ['null', null],
+    ['a string', 'image-abc'],
+  ])('rejects %s, which would otherwise throw in urlFor and fail the build', (_label, value) => {
+    expect(hasAsset(value)).toBe(false);
+  });
+});
+
+describe('withAsset', () => {
+  it('drops entries with no asset and keeps the rest in order', () => {
+    const photos = [withRef('a'), emptySlot, withRef('b')];
+    expect(withAsset(photos).map((p: ImageRef) => p._key)).toEqual(['a', 'b']);
+  });
+
+  it('returns an empty array for undefined', () => {
+    expect(withAsset(undefined)).toEqual([]);
   });
 
   it('returns nothing when every entry is empty', () => {
     expect(withAsset([emptySlot, emptySlot])).toEqual([]);
-  });
-
-  it('tolerates an asset object with no _ref', () => {
-    const noRef = { _type: 'image', _key: 'x', asset: {} } as unknown as ImageRef;
-    expect(withAsset([noRef])).toEqual([]);
   });
 });

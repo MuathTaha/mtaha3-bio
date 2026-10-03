@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { urlFor } from '@/sanity/lib/image';
 import type { Book } from '@/types/book';
+import { hasAsset } from '@/lib/imageRef';
 
 interface BookCoverProps {
   book: Book;
@@ -18,7 +19,7 @@ export function BookCover({ book }: BookCoverProps) {
       className="group relative aspect-[2/3] overflow-hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)] transition-colors hover:border-[var(--color-border-strong)]"
       onClick={() => setRevealed((v) => !v)}
     >
-      {book.cover ? (
+      {hasAsset(book.cover) ? (
         <Image
           src={urlFor(book.cover).width(400).fit('crop').url()}
           alt={`${book.title} cover`}

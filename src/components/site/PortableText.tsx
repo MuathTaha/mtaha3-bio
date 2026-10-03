@@ -2,6 +2,7 @@ import { PortableText as BasePortableText } from '@portabletext/react';
 import Image from 'next/image';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
+import { hasAsset } from '@/lib/imageRef';
 import type { PortableTextBlock } from '@portabletext/types';
 
 export function PortableText({ value }: { value: PortableTextBlock[] }) {
@@ -10,7 +11,9 @@ export function PortableText({ value }: { value: PortableTextBlock[] }) {
       value={value}
       components={{
         types: {
-          image: ({ value }) => (
+          // An image block added in the Studio without a file has no asset;
+          // urlFor() would throw and fail the build, so skip it.
+          image: ({ value }) => !hasAsset(value) ? null : (
             <figure className="my-8">
               <Image
                 src={urlFor(value).width(1400).url()}

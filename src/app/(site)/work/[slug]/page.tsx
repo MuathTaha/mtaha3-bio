@@ -10,6 +10,7 @@ import { PortableText } from '@/components/site/PortableText';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import type { Project } from '@/types/content';
+import { hasAsset } from '@/lib/imageRef';
 
 const STATUS_LABEL: Record<Project['status'], string> = {
   live:     'Live',
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: project.name,
       description: project.tagline,
       type: 'article',
-      images: project.logo
+      images: hasAsset(project.logo)
         ? [urlFor(project.logo).width(1200).height(630).url()]
         : undefined,
     },
@@ -67,7 +68,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           ) : null}
         </div>
         <div className="flex items-start gap-5">
-          {project.logo ? (
+          {hasAsset(project.logo) ? (
             <div className="relative h-16 w-16 shrink-0 overflow-hidden bg-[var(--color-bg-elevated)]">
               <Image
                 src={urlFor(project.logo).width(128).height(128).url()}

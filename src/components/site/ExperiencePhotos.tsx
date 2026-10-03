@@ -1,16 +1,7 @@
 import Image from 'next/image';
 import { urlFor } from '@/sanity/lib/image';
 import type { ImageRef } from '@/types/content';
-
-/**
- * Adding an item in the Studio's grid uploader without picking a file leaves an
- * image object with no asset, and urlFor() throws on those ("Unable to resolve
- * image URL from source"), which fails the whole build. An empty slot is easy to
- * create by accident, so drop them rather than let one take the site down.
- */
-export function withAsset(photos: ImageRef[]): ImageRef[] {
-  return photos.filter((photo) => Boolean(photo?.asset?._ref));
-}
+import { withAsset } from '@/lib/imageRef';
 
 /**
  * Gallery of snapshots from a single role, shown under the achievements.

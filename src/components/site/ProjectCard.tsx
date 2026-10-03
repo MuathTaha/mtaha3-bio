@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import type { Project } from '@/types/content';
+import { hasAsset } from '@/lib/imageRef';
 
 const statusLabel: Record<Project['status'], string> = {
   live:     'Live',
@@ -22,7 +23,7 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Wrapper>
       <div className="group flex items-start gap-4 border-t border-[var(--color-border)] py-6 transition-colors hover:border-[var(--color-accent)]">
-        {project.logo ? (
+        {hasAsset(project.logo) ? (
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-bg-elevated)]">
             <Image src={urlFor(project.logo).width(96).height(96).url()} alt={project.name} fill sizes="48px" className={fitClass(project.logo?.fit, 'contain')} />
           </div>

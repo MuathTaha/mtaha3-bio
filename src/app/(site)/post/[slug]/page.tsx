@@ -11,6 +11,7 @@ import { ShareButtons } from '@/components/site/ShareButtons';
 import { Giscus } from '@/components/site/Giscus';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
+import { hasAsset } from '@/lib/imageRef';
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs();
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: post.excerpt,
       type: 'article',
       publishedTime: post.publishedAt,
-      images: post.coverImage
+      images: hasAsset(post.coverImage)
         ? [urlFor(post.coverImage).width(1200).height(630).url()]
         : undefined,
     },
@@ -58,7 +59,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             datePublished: post.publishedAt,
             dateModified: post.updatedAt ?? post.publishedAt,
             author: { '@type': 'Person', name: 'Muath Taha', url: process.env.NEXT_PUBLIC_SITE_URL },
-            image: post.coverImage
+            image: hasAsset(post.coverImage)
               ? [urlFor(post.coverImage).width(1200).height(630).url()]
               : undefined,
           }),
@@ -81,7 +82,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-[var(--color-fg-muted)]">{post.excerpt}</p>
       </header>
-      {post.coverImage ? (
+      {hasAsset(post.coverImage) ? (
         <div className="relative mb-12 aspect-[16/7] w-full overflow-hidden rounded-sm border border-[var(--color-border)]">
           <Image
             src={urlFor(post.coverImage).width(1400).url()}

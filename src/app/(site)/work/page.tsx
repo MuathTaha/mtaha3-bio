@@ -8,6 +8,7 @@ import { ExperiencePhotos } from '@/components/site/ExperiencePhotos';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import type { Experience } from '@/types/content';
+import { hasAsset } from '@/lib/imageRef';
 
 export const metadata = { title: 'Work' };
 export const revalidate = 60;
@@ -48,7 +49,7 @@ function ExperienceEntry({ exp }: { exp: Experience }) {
   return (
     <article className="border-t border-[var(--color-border)] pt-8 first:border-t-0 first:pt-0">
       <div className="mb-4 flex items-start gap-4">
-        {exp.companyLogo ? (
+        {hasAsset(exp.companyLogo) ? (
           <div className="relative h-12 w-12 shrink-0 overflow-hidden bg-[var(--color-bg-elevated)]">
             <Image
               src={urlFor(exp.companyLogo).width(96).height(96).url()}

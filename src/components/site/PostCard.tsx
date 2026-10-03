@@ -4,6 +4,7 @@ import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import { cn } from '@/lib/cn';
 import type { Post } from '@/types/content';
+import { hasAsset } from '@/lib/imageRef';
 
 function formatDate(iso: string) {
   const d = new Date(iso);
@@ -31,7 +32,7 @@ export function PostCard({ post, featured = false }: { post: Post; featured?: bo
             {post.title}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-[var(--color-fg-muted)]">{post.excerpt}</p>
-          {post.coverImage && (featured || post.type === 'essay') ? (
+          {hasAsset(post.coverImage) && (featured || post.type === 'essay') ? (
             <div className="relative mt-5 aspect-[16/7] w-full overflow-hidden rounded-sm border border-[var(--color-border)]">
               <Image
                 src={urlFor(post.coverImage).width(1200).height(525).url()}
