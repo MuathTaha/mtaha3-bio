@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { serverEnv } from '@/lib/env';
+import { WELCOME_SUBJECT, welcomeHtml, welcomeText } from '@/lib/welcomeEmail';
 
 const schema = z.object({ email: z.string().email().max(200) });
 
@@ -44,9 +45,32 @@ export async function POST(req: NextRequest) {
     unsubscribed: false,
   });
 
-  if (error && !error.message?.includes('already')) {
+  // Re-submitting an address is not an error, but it must not trigger a second
+  // welcome email — otherwise refreshing the form spams whoever already signed up.
+  const alreadySubscribed = Boolean(error?.message?.includes('already'));
+
+  if (error && !alreadySubscribed) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  if (!alreadySubscribed) {
+    // The subscription is already stored; a failure to send the welcome must not
+    // lose it or show the visitor an error, so this is best-effort and logged.
+    try {
+      const { error: sendError } = await resend.emails.send({
+        from: serverEnv.RESEND_FROM_EMAIL ?? 'Muath Taha <hello@mtaha3.bio>',
+        to: parsed.data.email,
+        subject: WELCOME_SUBJECT,
+        text: welcomeText(),
+        html: welcomeHtml(),
+      });
+      if (sendError) {
+        console.error('[newsletter] welcome email failed:', sendError.message);
+      }
+    } catch (err) {
+      console.error('[newsletter] welcome email threw:', err);
+    }
+  }
+
+  return NextResponse.json({ ok: true, welcomed: !alreadySubscribed });
 }

@@ -16,10 +16,30 @@
   - HTTP method: POST
   - Secret: generate and store as `SANITY_WEBHOOK_SECRET`.
 
-### 2. Resend
-- Sign up at resend.com. Add domain `mtaha3.bio`, add the 3 DNS records Resend shows at Name.com.
-- Create audience "mtaha3.bio readers" → copy ID to `RESEND_AUDIENCE_ID`.
-- Create API key → `RESEND_API_KEY`.
+### 2. Resend — newsletter
+
+The footer form posts to `/api/newsletter/subscribe`, which stores the address as a
+Resend contact and sends a one-off welcome email (`src/lib/welcomeEmail.ts`).
+
+- Sign up at resend.com.
+- **Audience**: Resend keeps a single audience per account rather than named ones, so
+  there is nothing to create — just read its ID into `RESEND_AUDIENCE_ID`. If the
+  dashboard doesn't show it, list it over the API:
+  `curl -s https://api.resend.com/audiences -H "Authorization: Bearer <key>"`
+- **API key** → `RESEND_API_KEY`. It must be **full access**: a sending-only key
+  cannot write contacts, and the form will fail on every submission.
+- **Domain**: add `mtaha3.bio` and the DNS records Resend shows at Name.com. Only the
+  welcome email needs this — collecting contacts works before the domain is verified,
+  so an unverified domain shows as subscriptions saved with no welcome sent.
+- **Sender** → `RESEND_FROM_EMAIL`, e.g. `Muath Taha <hello@mtaha3.bio>`, on the
+  verified domain. Defaults to that address when unset.
+
+Behaviour worth knowing: a repeat submission of the same address succeeds without
+sending a second welcome, and a welcome that fails to send never loses the
+subscription — it is logged and the visitor still sees success.
+
+Nothing in the site emails subscribers after this. New-post announcements are sent
+from Resend's dashboard as broadcasts, or would need building.
 
 ### 3. GitHub
 - Create public repo `mtaha3/mtaha3-comments`. Settings → Features → Enable Discussions.

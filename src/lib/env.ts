@@ -25,6 +25,8 @@ const serverSchema = z.object({
   SANITY_STUDIO_PREVIEW_SECRET: z.string().optional(),
   RESEND_API_KEY:               z.string().optional(),
   RESEND_AUDIENCE_ID:           z.string().optional(),
+  // Sender for the welcome email. Must be on a domain verified in Resend.
+  RESEND_FROM_EMAIL:            z.string().optional(),
 });
 
 function parseOrFail<T extends z.ZodTypeAny>(schema: T, raw: Record<string, unknown>, label: string): z.infer<T> {
@@ -61,4 +63,5 @@ export const serverEnv = parseOrFail(serverSchema, {
   SANITY_STUDIO_PREVIEW_SECRET: process.env.SANITY_STUDIO_PREVIEW_SECRET,
   RESEND_API_KEY:               process.env.RESEND_API_KEY,
   RESEND_AUDIENCE_ID:           process.env.RESEND_AUDIENCE_ID,
+  RESEND_FROM_EMAIL:            process.env.RESEND_FROM_EMAIL,
 }, 'server');
