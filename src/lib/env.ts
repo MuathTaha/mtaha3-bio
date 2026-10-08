@@ -14,6 +14,9 @@ const publicSchema = z.object({
   NEXT_PUBLIC_SANITY_API_VERSION: z.string().default('2026-04-25'),
   NEXT_PUBLIC_SITE_URL:          z.string().url().default('https://mtaha3.bio'),
   NEXT_PUBLIC_GA_ID:             z.string().optional(),
+  // The site domain exactly as registered in Plausible; the tag only renders
+  // when this is set.
+  NEXT_PUBLIC_PLAUSIBLE_DOMAIN:  z.string().optional(),
   NEXT_PUBLIC_GISCUS_REPO:       z.string().optional(),
   NEXT_PUBLIC_GISCUS_REPO_ID:    z.string().optional(),
   NEXT_PUBLIC_GISCUS_CATEGORY_ID: z.string().optional(),
@@ -52,6 +55,7 @@ export const publicEnv = parseOrFail(publicSchema, {
   NEXT_PUBLIC_SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
   NEXT_PUBLIC_SITE_URL:           process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_GA_ID:              process.env.NEXT_PUBLIC_GA_ID,
+  NEXT_PUBLIC_PLAUSIBLE_DOMAIN:   process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
   NEXT_PUBLIC_GISCUS_REPO:        process.env.NEXT_PUBLIC_GISCUS_REPO,
   NEXT_PUBLIC_GISCUS_REPO_ID:     process.env.NEXT_PUBLIC_GISCUS_REPO_ID,
   NEXT_PUBLIC_GISCUS_CATEGORY_ID: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,

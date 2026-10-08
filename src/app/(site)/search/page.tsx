@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { sendGAEvent } from '@next/third-parties/google';
+import { trackEvent } from '@/lib/analytics';
 import { buildSearcher, type SearchItem } from '@/lib/search';
 import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -18,7 +18,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!q) return;
-    const t = setTimeout(() => sendGAEvent('event', 'search', { search_term: q }), 500);
+    const t = setTimeout(() => trackEvent('search', { search_term: q }), 500);
     return () => clearTimeout(t);
   }, [q]);
 
