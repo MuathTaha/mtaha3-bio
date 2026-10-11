@@ -31,9 +31,18 @@ describe('content security policy', () => {
     expect(directive(await contentPageCsp(), 'connect-src')).toContain('https://plausible.io');
   });
 
-  it('still allows GA4 and Sanity alongside it', async () => {
+  it('still allows Sanity alongside it', async () => {
+    expect(directive(await contentPageCsp(), 'connect-src')).toContain('https://*.api.sanity.io');
+  });
+
+  /**
+   * GA4 was removed as the site's only cookie-setting tracker. Its origins
+   * should go with it: leaving them allowed would silently permit a reintroduced
+   * tag to load and start setting cookies again.
+   */
+  it('no longer allows the Google Analytics origins', async () => {
     const csp = await contentPageCsp();
-    expect(directive(csp, 'script-src')).toContain('https://www.googletagmanager.com');
-    expect(directive(csp, 'connect-src')).toContain('https://*.api.sanity.io');
+    expect(csp).not.toContain('googletagmanager.com');
+    expect(csp).not.toContain('google-analytics.com');
   });
 });

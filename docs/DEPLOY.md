@@ -47,30 +47,31 @@ from Resend's dashboard as broadcasts, or would need building.
 
 ### 4. Analytics
 
-Three are wired up, and each needs a step outside the code:
+Nothing here sets cookies, so the site needs no consent banner. Keep it that way:
+GA4 was removed for exactly that reason, and adding it — or any cookie-setting
+tracker — brings the banner obligation back with it.
 
-- **Google Analytics 4** — create a GA4 property at analytics.google.com and put the
-  Measurement ID (G-XXXXX) in `NEXT_PUBLIC_GA_ID`. Without that variable the tag
-  never renders and nothing is tracked. GA4 sets cookies, so an EU audience needs a
-  consent banner.
-- **Plausible** — add the site in Plausible, then set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`
-  to the domain exactly as registered there (`mtaha3.bio`, no scheme or trailing
-  slash); a mismatch silently records nothing. The tag only renders when that
-  variable is set. Cookieless and GDPR-friendly, so no consent banner. Unlike the
-  other two it is a paid service beyond the trial. `plausible.io` is allowed in the
-  CSP's `script-src` and `connect-src` — the beacon is blocked without the latter.
-  To count visitors that ad blockers would otherwise hide, Plausible can be proxied
-  through a Next rewrite; not set up here.
-- **Vercel Web Analytics** — installing `@vercel/analytics` is not enough; turn it on
-  in the Vercel project under Analytics. Cookieless, so no consent banner. In
-  production its script and beacon are same-origin under `/_vercel/insights/`, which
-  the CSP's `'self'` already allows — no CSP change needed.
+- **Vercel Web Analytics** (the live one) — installing `@vercel/analytics` is not
+  enough; turn it on in the Vercel project under Analytics. Cookieless. In production
+  its script and beacon are same-origin under `/_vercel/insights/`, which the CSP's
+  `'self'` already allows, so ad blockers don't treat it as third-party tracking and
+  it isn't blocked. Retention depends on the plan.
+- **Plausible** (wired up, dormant) — the tag only renders when
+  `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set, and that variable is deliberately unset, so
+  nothing loads and nothing is billed. To switch it on: add the site in Plausible,
+  then set the variable to the domain exactly as registered there (`mtaha3.bio`, no
+  scheme or trailing slash) — a mismatch silently records nothing. Note it is a paid
+  service beyond the trial, and `plausible.io` sits on common ad-block lists, so it
+  will undercount relative to Vercel unless proxied through a Next rewrite (not set
+  up here). `plausible.io` is already allowed in the CSP's `script-src` and
+  `connect-src`; the beacon is blocked without the latter.
 
-Custom events go through `trackEvent()` in `src/lib/analytics.ts`, which fans out to
-GA4 and Plausible under one name so a Plausible goal and a GA4 event can't drift
-apart. Currently sent: `newsletter_signup`, `cv_download`, and `search` (with the
-search term). Each name has to be registered as a goal in Plausible before it shows
-up in its dashboard.
+Custom events go through `trackEvent()` in `src/lib/analytics.ts` — one place to add
+or swap a tool rather than a hunt through components. Currently sent:
+`newsletter_signup`, `cv_download`, and `search` (with the search term). Plausible is
+the only destination that takes them, so while it is dormant these calls are no-ops;
+Vercel Web Analytics tracks pageviews on its own and needs no wiring. Each name also
+has to be registered as a goal in Plausible before it appears in its dashboard.
 
 ### 5. Vercel
 - Push repo to GitHub. Import into Vercel. Add all env vars from `.env.local`.
