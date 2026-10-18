@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { trackEvent } from '@/lib/analytics';
 
+const GENERIC_ERROR = "Sorry — that didn't work. Please try again.";
+
 export function NewsletterForm({ cta }: { cta: string }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
@@ -11,6 +13,9 @@ export function NewsletterForm({ cta }: { cta: string }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setState('loading');
+    // Clear any previous result, so a stale error doesn't sit there looking
+    // like the outcome of this attempt.
+    setMsg('');
     try {
       const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
@@ -18,8 +23,11 @@ export function NewsletterForm({ cta }: { cta: string }) {
         body: JSON.stringify({ email }),
       });
       if (!res.ok) {
-        const { error } = await res.json().catch(() => ({ error: 'Failed' }));
-        setMsg(error);
+        const body = await res.json().catch(() => null);
+        // A response with no usable `error` would otherwise set the message to
+        // undefined and render nothing at all — the button would just return to
+        // idle, leaving the visitor unsure whether anything happened.
+        setMsg(body?.error ?? GENERIC_ERROR);
         setState('err');
         return;
       }

@@ -22,10 +22,12 @@ The footer form posts to `/api/newsletter/subscribe`, which stores the address a
 Resend contact and sends a one-off welcome email (`src/lib/welcomeEmail.ts`).
 
 - Sign up at resend.com.
-- **Audience**: Resend keeps a single audience per account rather than named ones, so
-  there is nothing to create — just read its ID into `RESEND_AUDIENCE_ID`. If the
-  dashboard doesn't show it, list it over the API:
-  `curl -s https://api.resend.com/audiences -H "Authorization: Bearer <key>"`
+- **Segment** → `RESEND_SEGMENT_ID`. Resend renamed Audiences to Segments, so the
+  dashboard has no "create audience" button any more — look under **Segments** and
+  read the ID from there. Over the API:
+  `curl -s https://api.resend.com/segments -H "Authorization: Bearer <key>"`
+  (`RESEND_AUDIENCE_ID` is still read as a fallback so deployments set up before the
+  rename keep working, but prefer the new name.)
 - **API key** → `RESEND_API_KEY`. It must be **full access**: a sending-only key
   cannot write contacts, and the form will fail on every submission.
 - **Domain**: add `mtaha3.bio` and the DNS records Resend shows at Name.com. Only the
@@ -37,6 +39,12 @@ Resend contact and sends a one-off welcome email (`src/lib/welcomeEmail.ts`).
 Behaviour worth knowing: a repeat submission of the same address succeeds without
 sending a second welcome, and a welcome that fails to send never loses the
 subscription — it is logged and the visitor still sees success.
+
+Visitors never see the reason a submission failed; they get one fixed message while
+the detail goes to the server log, prefixed `[newsletter]` and visible in Vercel's
+Logs tab. So when diagnosing a form that isn't working, read the log, not the page:
+`not configured` means an env var is missing (503), `contact create failed` means
+Resend rejected it (502).
 
 Nothing in the site emails subscribers after this. New-post announcements are sent
 from Resend's dashboard as broadcasts, or would need building.
