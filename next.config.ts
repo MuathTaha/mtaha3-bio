@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
 
 const giscusOrigins = 'https://giscus.app';
-const gaOrigins = 'https://www.googletagmanager.com https://www.google-analytics.com';
 // Plausible serves the tag and receives its event beacon from the same origin,
 // so it needs both script-src and connect-src.
 const plausibleOrigins = 'https://plausible.io';
@@ -26,11 +25,11 @@ const studioFrameAncestors = [
 const csp = (frameAncestors: string) =>
   [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${giscusOrigins} ${gaOrigins} ${plausibleOrigins}`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${giscusOrigins} ${plausibleOrigins}`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: ${sanityOrigins} https://avatars.githubusercontent.com`,
     `font-src 'self' data:`,
-    `connect-src 'self' ${giscusOrigins} ${gaOrigins} ${plausibleOrigins} ${sanityOrigins}`,
+    `connect-src 'self' ${giscusOrigins} ${plausibleOrigins} ${sanityOrigins}`,
     // 'self' lets the studio embedded at /studio frame the site for Presentation previews.
     `frame-src 'self' ${giscusOrigins}`,
     `frame-ancestors ${frameAncestors}`,

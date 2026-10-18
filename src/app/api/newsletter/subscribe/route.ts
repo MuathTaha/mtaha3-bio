@@ -6,6 +6,14 @@ import { WELCOME_SUBJECT, welcomeHtml, welcomeText } from '@/lib/welcomeEmail';
 
 const schema = z.object({ email: z.string().email().max(200) });
 
+/**
+ * What a visitor sees when the fault is ours. Deliberately one fixed string:
+ * the specifics ("Server not configured", a raw Resend message) tell a reader
+ * nothing they can act on and expose how the back end is wired. The detail
+ * goes to the server log instead, where it is actually useful.
+ */
+const UNAVAILABLE = "Sorry — signup isn't working right now. Please try again later.";
+
 // Simple in-memory rate limit (per-IP, 5/min). For prod scale, swap to Upstash.
 const buckets = new Map<string, { count: number; reset: number }>();
 function rateLimit(ip: string, limit = 5, windowMs = 60_000): boolean {
@@ -33,24 +41,38 @@ export async function POST(req: NextRequest) {
   }
 
   const apiKey = serverEnv.RESEND_API_KEY;
-  const audienceId = serverEnv.RESEND_AUDIENCE_ID;
-  if (!apiKey || !audienceId) {
-    return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
+  // Resend renamed Audiences to Segments; `audiences` is now an alias of
+  // `segments` and `audienceId` is deprecated. The dashboard only offers
+  // segments, so that is the name to configure — the old one is still read so
+  // an existing deployment keeps working.
+  const segmentId = serverEnv.RESEND_SEGMENT_ID ?? serverEnv.RESEND_AUDIENCE_ID;
+  if (!apiKey || !segmentId) {
+    // Named precisely in the log so this is distinguishable from a Resend
+    // outage; the visitor just sees that signup is unavailable.
+    console.error(
+      `[newsletter] not configured: missing ${!apiKey ? 'RESEND_API_KEY' : 'RESEND_SEGMENT_ID'}`,
+    );
+    return NextResponse.json({ error: UNAVAILABLE }, { status: 503 });
   }
 
   const resend = new Resend(apiKey);
   const { error } = await resend.contacts.create({
     email: parsed.data.email,
-    audienceId,
     unsubscribed: false,
+    segments: [{ id: segmentId }],
   });
 
   // Re-submitting an address is not an error, but it must not trigger a second
-  // welcome email — otherwise refreshing the form spams whoever already signed up.
-  const alreadySubscribed = Boolean(error?.message?.includes('already'));
+  // welcome email — otherwise refreshing the form spams whoever already signed
+  // up. Resend has no distinct error code for it (duplicates arrive as
+  // validation_error), so the message is all there is to go on.
+  const alreadySubscribed = /already|exists/i.test(error?.message ?? '');
 
   if (error && !alreadySubscribed) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // The reason belongs in the logs, not in the page: it can name internals,
+    // and a visitor can act on none of it.
+    console.error(`[newsletter] contact create failed (${error.name}):`, error.message);
+    return NextResponse.json({ error: UNAVAILABLE }, { status: 502 });
   }
 
   if (!alreadySubscribed) {

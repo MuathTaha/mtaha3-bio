@@ -12,9 +12,12 @@ vi.mock('resend', () => ({
 
 const env: Record<string, string | undefined> = {
   RESEND_API_KEY: 'test-key',
-  RESEND_AUDIENCE_ID: 'aud-1',
+  RESEND_SEGMENT_ID: 'seg-1',
   RESEND_FROM_EMAIL: 'Muath <hello@mtaha3.bio>',
 };
+
+/** What the route shows a visitor for any fault of ours. */
+const UNAVAILABLE = "Sorry — signup isn't working right now. Please try again later.";
 vi.mock('@/lib/env', () => ({ get serverEnv() { return env; } }));
 
 const { POST } = await import('@/app/api/newsletter/subscribe/route');
@@ -38,7 +41,8 @@ describe('newsletter subscribe', () => {
     contactsCreate.mockResolvedValue({ error: null });
     emailsSend.mockResolvedValue({ error: null });
     env.RESEND_API_KEY = 'test-key';
-    env.RESEND_AUDIENCE_ID = 'aud-1';
+    env.RESEND_SEGMENT_ID = 'seg-1';
+    env.RESEND_AUDIENCE_ID = undefined;
   });
 
   it('stores the contact and sends one welcome email', async () => {
@@ -46,10 +50,11 @@ describe('newsletter subscribe', () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true, welcomed: true });
 
+    // The non-deprecated shape: Resend replaced Audiences with Segments.
     expect(contactsCreate).toHaveBeenCalledWith({
       email: 'reader@example.com',
-      audienceId: 'aud-1',
       unsubscribed: false,
+      segments: [{ id: 'seg-1' }],
     });
     expect(emailsSend).toHaveBeenCalledTimes(1);
     const sent = emailsSend.mock.calls[0][0];
@@ -82,10 +87,22 @@ describe('newsletter subscribe', () => {
   });
 
   it('reports a real contact-creation failure', async () => {
-    contactsCreate.mockResolvedValue({ error: { message: 'Invalid audience' } });
+    contactsCreate.mockResolvedValue({
+      error: { message: 'Invalid segment', name: 'validation_error' },
+    });
     const res = await post({ email: 'reader@example.com' });
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(502);
     expect(emailsSend).not.toHaveBeenCalled();
+  });
+
+  it('never shows a visitor the internal reason for a failure', async () => {
+    contactsCreate.mockResolvedValue({
+      error: { message: 'segment 4f2a is not owned by this api key', name: 'invalid_access' },
+    });
+    const res = await post({ email: 'reader@example.com' });
+    const body = await res.json();
+    expect(body).toEqual({ error: UNAVAILABLE });
+    expect(JSON.stringify(body)).not.toMatch(/segment 4f2a|api key/i);
   });
 
   it('rejects a malformed email without calling Resend', async () => {
@@ -95,9 +112,23 @@ describe('newsletter subscribe', () => {
   });
 
   it('reports missing configuration rather than failing silently', async () => {
-    env.RESEND_AUDIENCE_ID = undefined;
+    env.RESEND_SEGMENT_ID = undefined;
     const res = await post({ email: 'reader@example.com' });
-    expect(res.status).toBe(500);
-    expect(await res.json()).toEqual({ error: 'Server not configured' });
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: UNAVAILABLE });
+    expect(contactsCreate).not.toHaveBeenCalled();
+  });
+
+  /** Deployments set up before Resend's rename still carry the old name. */
+  it('falls back to RESEND_AUDIENCE_ID when the new name is unset', async () => {
+    env.RESEND_SEGMENT_ID = undefined;
+    env.RESEND_AUDIENCE_ID = 'aud-legacy';
+    const res = await post({ email: 'reader@example.com' });
+    expect(res.status).toBe(200);
+    expect(contactsCreate).toHaveBeenCalledWith({
+      email: 'reader@example.com',
+      unsubscribed: false,
+      segments: [{ id: 'aud-legacy' }],
+    });
   });
 });
