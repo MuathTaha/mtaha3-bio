@@ -8,7 +8,7 @@ import { Prose } from '@/components/ui/Prose';
 import { PortableText } from '@/components/site/PortableText';
 import { TagChip } from '@/components/site/TagChip';
 import { ShareButtons } from '@/components/site/ShareButtons';
-import { Giscus } from '@/components/site/Giscus';
+import { Comments } from '@/components/site/Comments';
 import { urlFor } from '@/sanity/lib/image';
 import { fitClass } from '@/lib/imageFit';
 import { hasAsset } from '@/lib/imageRef';
@@ -108,7 +108,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         title={post.title}
         url={`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/post/${post.slug}`}
       />
-      <Giscus term={post.slug} />
+      <Comments postId={post._id} />
     </Container>
   );
 }

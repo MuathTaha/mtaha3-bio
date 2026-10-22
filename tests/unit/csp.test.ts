@@ -45,4 +45,17 @@ describe('content security policy', () => {
     expect(csp).not.toContain('googletagmanager.com');
     expect(csp).not.toContain('google-analytics.com');
   });
+
+  /**
+   * Comments are first-party now, so nothing third-party is framed or scripted
+   * for them. giscus.app and the GitHub avatar host it loaded images from
+   * should both be gone, and frame-src should permit only 'self' (which the
+   * Sanity Presentation preview still needs).
+   */
+  it('no longer allows the giscus origins', async () => {
+    const csp = await contentPageCsp();
+    expect(csp).not.toContain('giscus.app');
+    expect(csp).not.toContain('githubusercontent.com');
+    expect(directive(csp, 'frame-src')).toBe("frame-src 'self'");
+  });
 });

@@ -49,9 +49,34 @@ Resend rejected it (502).
 Nothing in the site emails subscribers after this. New-post announcements are sent
 from Resend's dashboard as broadcasts, or would need building.
 
-### 3. GitHub
-- Create public repo `mtaha3/mtaha3-comments`. Settings → Features → Enable Discussions.
-- Visit https://giscus.app, paste repo, pick the "General" category. Copy `data-repo-id` and `data-category-id` to `NEXT_PUBLIC_GISCUS_REPO_ID` / `NEXT_PUBLIC_GISCUS_CATEGORY_ID`.
+### 3. Comments
+
+Comments are first-party: stored in Sanity, rendered server-side on the post page,
+no third-party script and no account needed to leave one. This replaced giscus,
+which required every commenter to have a GitHub login.
+
+- **`SANITY_API_WRITE_TOKEN`** — the only setup step. Sanity → project → API →
+  Tokens → add a token with **Editor** rights. `/api/comments` creates documents
+  with it; without it the form returns 503 and logs `[comments] not configured`.
+  A Viewer token is not enough.
+- **`COMMENT_NOTIFY_EMAIL`** — optional. When set (and `RESEND_API_KEY` exists),
+  each new comment emails you so the queue doesn't need watching. Unset sends none.
+
+**Moderating**: every comment is created already published but with `approved`
+off, so it shows up in the Studio under **Comments → Awaiting approval** while the
+site — which filters on `approved` — never renders it. Approve by switching the
+toggle on and publishing; delete spam instead. The revalidate webhook refreshes
+the post pages on approval, so an approved comment appears within seconds.
+
+Spam is handled without a captcha, by three things together: nothing publishes
+without your approval, a hidden honeypot field catches bots that fill every input,
+and a per-IP limit of 3 per 10 minutes blunts flooding. The in-memory limiter is
+per-instance and resets on a cold start — it raises the cost of flooding rather
+than acting as a real quota, which is acceptable because moderation is what
+actually protects the page.
+
+A reader's email, if they give one, is stored for private replies and is never
+selected into the page query, so it cannot leak into the HTML.
 
 ### 4. Analytics
 

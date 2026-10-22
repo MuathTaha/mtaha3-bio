@@ -16,13 +16,14 @@ const publicSchema = z.object({
   // The site domain exactly as registered in Plausible; the tag only renders
   // when this is set.
   NEXT_PUBLIC_PLAUSIBLE_DOMAIN:  z.string().optional(),
-  NEXT_PUBLIC_GISCUS_REPO:       z.string().optional(),
-  NEXT_PUBLIC_GISCUS_REPO_ID:    z.string().optional(),
-  NEXT_PUBLIC_GISCUS_CATEGORY_ID: z.string().optional(),
 });
 
 const serverSchema = z.object({
   SANITY_API_READ_TOKEN:        z.string().optional(),
+  // Needs Editor rights: the comments route creates documents with it.
+  SANITY_API_WRITE_TOKEN:       z.string().optional(),
+  // Where to send "new comment" notifications. Unset means none are sent.
+  COMMENT_NOTIFY_EMAIL:         z.string().optional(),
   SANITY_WEBHOOK_SECRET:        z.string().optional(),
   SANITY_STUDIO_PREVIEW_SECRET: z.string().optional(),
   RESEND_API_KEY:               z.string().optional(),
@@ -57,13 +58,12 @@ export const publicEnv = parseOrFail(publicSchema, {
   NEXT_PUBLIC_SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
   NEXT_PUBLIC_SITE_URL:           process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_PLAUSIBLE_DOMAIN:   process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
-  NEXT_PUBLIC_GISCUS_REPO:        process.env.NEXT_PUBLIC_GISCUS_REPO,
-  NEXT_PUBLIC_GISCUS_REPO_ID:     process.env.NEXT_PUBLIC_GISCUS_REPO_ID,
-  NEXT_PUBLIC_GISCUS_CATEGORY_ID: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
 }, 'public');
 
 export const serverEnv = parseOrFail(serverSchema, {
   SANITY_API_READ_TOKEN:        process.env.SANITY_API_READ_TOKEN,
+  SANITY_API_WRITE_TOKEN:       process.env.SANITY_API_WRITE_TOKEN,
+  COMMENT_NOTIFY_EMAIL:         process.env.COMMENT_NOTIFY_EMAIL,
   SANITY_WEBHOOK_SECRET:        process.env.SANITY_WEBHOOK_SECRET,
   SANITY_STUDIO_PREVIEW_SECRET: process.env.SANITY_STUDIO_PREVIEW_SECRET,
   RESEND_API_KEY:               process.env.RESEND_API_KEY,

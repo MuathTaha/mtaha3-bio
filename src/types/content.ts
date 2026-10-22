@@ -33,6 +33,14 @@ export type Post = {
   ogImage?: ImageRef;
 };
 
+/** A reader's comment, as rendered. Email is never selected into this shape. */
+export type Comment = {
+  _id: string;
+  name: string;
+  body: string;
+  _createdAt: string;
+};
+
 export type Project = {
   _id: string;
   name: string;

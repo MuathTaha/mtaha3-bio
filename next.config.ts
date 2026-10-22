@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next';
 
-const giscusOrigins = 'https://giscus.app';
 // Plausible serves the tag and receives its event beacon from the same origin,
 // so it needs both script-src and connect-src.
 const plausibleOrigins = 'https://plausible.io';
@@ -25,13 +24,14 @@ const studioFrameAncestors = [
 const csp = (frameAncestors: string) =>
   [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${giscusOrigins} ${plausibleOrigins}`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${plausibleOrigins}`,
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' data: blob: ${sanityOrigins} https://avatars.githubusercontent.com`,
+    `img-src 'self' data: blob: ${sanityOrigins}`,
     `font-src 'self' data:`,
-    `connect-src 'self' ${giscusOrigins} ${plausibleOrigins} ${sanityOrigins}`,
+    `connect-src 'self' ${plausibleOrigins} ${sanityOrigins}`,
     // 'self' lets the studio embedded at /studio frame the site for Presentation previews.
-    `frame-src 'self' ${giscusOrigins}`,
+    // Nothing else is framed now that comments are first-party.
+    `frame-src 'self'`,
     `frame-ancestors ${frameAncestors}`,
     `base-uri 'self'`,
     `form-action 'self'`,
