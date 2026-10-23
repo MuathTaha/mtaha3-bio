@@ -74,6 +74,14 @@ describe('revalidate webhook', () => {
     ]);
   });
 
+  /**
+   * Approving a comment must show up on the post it belongs to. The payload
+   * carries no slug for a comment, so the whole post family is refreshed.
+   */
+  it('refreshes post pages when a comment is approved', async () => {
+    expect(await callsFor({ _type: 'comment' })).toEqual([['/post/[slug]', 'page']]);
+  });
+
   it('refreshes the whole layout tree for site settings, since the footer is everywhere', async () => {
     expect(await callsFor({ _type: 'siteSettings' })).toEqual([['/', 'layout']]);
   });

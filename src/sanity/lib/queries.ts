@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity';
 import type { SanityClient } from 'next-sanity';
 import { client } from './client';
-import type { Experience, Post, Project, SiteSettings, Tag } from '@/types/content';
+import type { Comment, Experience, Post, Project, SiteSettings, Tag } from '@/types/content';
 import type { Book } from '@/types/book';
 
 const POST_FIELDS = groq`
@@ -114,6 +114,20 @@ export async function getSiteSettings(c: SanityClient = client): Promise<SiteSet
       handle: 'mtaha',
       shortBio: '',
     }
+  );
+}
+
+/**
+ * Approved comments for one post, oldest first so a thread reads top to bottom.
+ * `approved` is filtered here rather than in the component so an unapproved
+ * comment never reaches the client at all; `email` is deliberately not selected,
+ * so a reader's address cannot leak into the page source.
+ */
+export async function getComments(postId: string, c: SanityClient = client): Promise<Comment[]> {
+  return c.fetch(
+    groq`*[_type == "comment" && approved == true && post._ref == $postId]
+      | order(_createdAt asc) { _id, name, body, _createdAt }`,
+    { postId }
   );
 }
 

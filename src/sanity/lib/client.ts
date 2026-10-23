@@ -21,6 +21,18 @@ export const client = createClient({
   perspective: 'published',
 });
 
+/**
+ * Writes reader comments. Server-only: SANITY_API_WRITE_TOKEN grants create
+ * rights on the dataset, so it must never be imported from a client component.
+ */
+export const writeClient = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: false,
+  token: serverEnv.SANITY_API_WRITE_TOKEN,
+});
+
 export const draftClient = createClient({
   projectId,
   dataset,

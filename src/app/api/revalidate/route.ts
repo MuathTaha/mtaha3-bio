@@ -59,6 +59,11 @@ export async function POST(req: NextRequest) {
       revalidatePath('/work');
     } else if (type === 'book') {
       revalidatePath('/books');
+    } else if (type === 'comment') {
+      // Approving a comment has to show up on the post it belongs to. The
+      // payload carries no slug for a comment, so refresh the whole family
+      // rather than trying to resolve which post it points at.
+      revalidatePath('/post/[slug]', 'page');
     } else if (type === 'siteSettings') {
       // The bio and socials feed the footer on every page, plus the home hero
       // and About, so refresh the whole tree under the root layout.
