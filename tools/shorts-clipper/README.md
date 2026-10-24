@@ -56,7 +56,7 @@ The first time you upload, a browser tab opens so you can sign in and choose you
 
 ## 4. Make a Short
 
-1. Start the companion and leave the terminal open:
+1. Start the companion and leave its window open. On Windows, double-click **`start.bat`** in the `companion` folder. Or, from a terminal:
 
    ```bash
    cd companion
