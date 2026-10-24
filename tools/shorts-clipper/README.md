@@ -15,7 +15,7 @@ Chrome extensions aren't allowed to run ffmpeg or save large files, so the compa
 
 ## 1. Install the tools (once)
 
-1. Install **Python 3.10 or newer** from [python.org](https://www.python.org/downloads/).
+1. Install **Python 3.13** (64-bit) from [python.org](https://www.python.org/downloads/). On Windows, tick **Add python.exe to PATH** in the installer. Newer Python versions work for everything except speech-recognition captions, which need Python 3.9–3.14.
 2. Install **ffmpeg**:
    - Windows: `winget install ffmpeg`
    - macOS: `brew install ffmpeg`
@@ -27,7 +27,10 @@ Chrome extensions aren't allowed to run ffmpeg or save large files, so the compa
    python -m venv .venv
    # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
    pip install -r requirements.txt
+   pip install -r requirements-captions.txt
    ```
+
+   The second command installs speech recognition, which is needed for captions on screen recordings. It's optional: if it fails, everything else still works, and YouTube clips still get YouTube's own captions. See Troubleshooting.
 
 ## 2. Let it upload to your YouTube channel (once)
 
@@ -119,4 +122,5 @@ python -m unittest -v test_shorts
 - **Downloads fail**: YouTube changes often, so update yt-dlp with `pip install -U yt-dlp`.
 - **Recording has no sound**: tick the audio box in Chrome's share picker. Window recordings on macOS can't capture system audio, so record a Chrome tab instead.
 - **"speech recognition failed"**: the first use needs internet to download the speech model, from huggingface.co.
+- **`pip install -r requirements-captions.txt` fails with "ResolutionImpossible ... ctranslate2"**: your Python is too new (3.15 or later), is 32-bit, or runs on Windows on ARM. Check with `python -c "import sys, platform; print(sys.version, platform.machine())"`. Then install 64-bit Python 3.13, delete the `.venv` folder, and set it up again with `py -3.13 -m venv .venv`. On Windows on ARM, speech recognition isn't available yet.
 - **"Missing client_secret.json"**: finish section 2.

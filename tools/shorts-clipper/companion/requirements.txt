@@ -2,4 +2,3 @@ yt-dlp>=2025.1.1
 google-api-python-client>=2.100
 google-auth-oauthlib>=1.2
 google-auth>=2.23
-faster-whisper>=1.0  # local speech recognition for captions

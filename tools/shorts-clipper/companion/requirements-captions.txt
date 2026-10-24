@@ -1,0 +1,3 @@
+# Local speech recognition for captions on screen recordings (optional).
+# Needs 64-bit Python 3.9-3.14 on Windows x64, macOS or Linux.
+faster-whisper>=1.0
