@@ -1,15 +1,17 @@
 # Shorts Clipper
 
-Mark a moment in any YouTube video from Chrome, turn it into a vertical 1080×1920 Short, and upload it to your channel. Everything runs on your own computer, and the tools it uses are free.
+Turn a YouTube video, or anything you record on your screen, into captioned vertical 1080×1920 Shorts, and upload them to your channel. Everything runs on your own computer, and the tools it uses are free.
 
 It has two parts:
 
-- **`extension/`**: a Chrome extension. On a YouTube video you click **⏱ Now** to set the start and end, add a title, and click **Create clip**.
-- **`companion/`**: a small Python app that runs in the background. It downloads the video with yt-dlp, cuts and reframes the clip with ffmpeg, and uploads it with the YouTube Data API.
+- **`extension/`**: a Chrome extension with two ways in:
+  - **YouTube**: on a video you click **⏱ Now** to set the start and end, add a title, and click **Create clip**.
+  - **Screen recorder**: record a tab, a window or your whole screen, like the Windows screen recorder, then cut clips from the recording.
+- **`companion/`**: a small Python app that runs in the background. It downloads videos with yt-dlp, stores your recordings, adds captions, cuts and reframes clips with ffmpeg, and uploads them with the YouTube Data API.
 
 Chrome extensions aren't allowed to run ffmpeg or save large files, so the companion does the heavy work. It only listens on `127.0.0.1`, and it only accepts requests carrying the pairing token it prints when it starts.
 
-> **Only clip videos you own or have permission to reuse.** Re-uploading other people's content can get your channel copyright strikes.
+> **Only clip videos you own or have permission to reuse.** Recording your screen doesn't change who owns what's on it: re-uploading other people's content can get your channel copyright strikes. Streaming services that use copy protection (Netflix and similar) record as a black screen.
 
 ## 1. Install the tools (once)
 
@@ -70,14 +72,29 @@ The first time you upload, a browser tab opens so you can sign in and choose you
 
 Clips are saved in `companion/data/clips/`. Each source video is downloaded once and reused for every clip you cut from it.
 
+## 5. Record your screen and clip it
+
+Use this for anything you can play or show on your screen: a webinar, a Zoom or Teams recording, a training video, a demo of your product, or a YouTube video.
+
+1. With the companion running, click the extension, then click **● Record screen, then clip it**. A recorder page opens.
+2. Optionally name the recording, and tick **Also record my microphone** if you want to talk over it.
+3. Click **● Start recording**. In Chrome's picker, choose:
+   - **Chrome tab**: the cleanest picture. Leave **Also share tab audio** ticked.
+   - **Window** or **Entire screen**: to record any app. On Windows, tick **Also share system audio** to get sound.
+4. Play what you want to capture. The recording is saved to the companion every few seconds, so a long recording won't run out of browser memory, and the part already recorded survives a crash.
+5. Click **■ Stop recording**, or Chrome's **Stop sharing** bar. The recording opens in the clip editor.
+6. Scrub the player and click **⏱ Now** to set each clip's start and end, then fill in the details as in step 4 and click **Create clip**. You can cut as many clips as you like from one recording.
+
+Recordings are saved in `companion/data/recordings/`. Delete them from the recorder page when you're done; clips already made from a recording are kept.
+
 ## Captions
 
 Captions show 2–3 words at a time in bold white text, with the word being spoken in yellow, placed just under the video. The words come from:
 
-1. **The video's YouTube captions** (the default): uploaded captions if the creator added them, otherwise YouTube's auto-generated ones. This needs nothing extra.
-2. **Speech recognition on your computer** when the video has no captions. This uses faster-whisper, which is free and runs offline after the first use. The first time, it downloads a speech model of about 500 MB. To use a smaller, faster model, set `WHISPER_MODEL=base` before starting `server.py`.
+1. **The video's YouTube captions**, for clips of YouTube videos: uploaded captions if the creator added them, otherwise YouTube's auto-generated ones.
+2. **Speech recognition on your computer** for screen recordings, and for YouTube videos without captions. This uses faster-whisper, which is free and runs offline after the first use. The first time, it downloads a speech model of about 500 MB. To use a smaller, faster model, set `WHISPER_MODEL=base` before starting `server.py`, or set `WHISPER_MODEL=medium` for better accuracy.
 
-If neither finds speech, the clip is still made, just without captions.
+Set the language code in the clip form (`en`, `ar`, `fr` and so on) so speech recognition listens for the right language. If no captions can be made, the clip is still cut, and its status says why.
 
 ## Without the extension
 
@@ -100,4 +117,6 @@ python -m unittest -v test_shorts
 
 - **"companion offline"**: `server.py` isn't running. Start it as in step 4.
 - **Downloads fail**: YouTube changes often, so update yt-dlp with `pip install -U yt-dlp`.
+- **Recording has no sound**: tick the audio box in Chrome's share picker. Window recordings on macOS can't capture system audio, so record a Chrome tab instead.
+- **"speech recognition failed"**: the first use needs internet to download the speech model, from huggingface.co.
 - **"Missing client_secret.json"**: finish section 2.

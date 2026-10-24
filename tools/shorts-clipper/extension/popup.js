@@ -1,35 +1,8 @@
-const API = "http://127.0.0.1:8765";
-const BUSY = ["queued", "working", "uploading"];
+// Popup: clip the YouTube video in the current tab. Helpers live in common.js.
 const FIELDS = ["start", "end", "title", "description", "tags", "framing", "privacy", "lang"];
-const $ = (id) => document.getElementById(id);
 
-let token = "";
 let video = null; // {videoId, url, title, time, duration} from the open YouTube tab
-let pollTimer = null;
-
-function fmt(seconds) {
-  const s = Math.max(0, seconds);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const rest = (s % 60).toFixed(1).padStart(4, "0");
-  return h ? `${h}:${String(m).padStart(2, "0")}:${rest}` : `${m}:${rest}`;
-}
-
-function parse(value) {
-  const parts = String(value).trim().split(":").map(Number);
-  if (!value || parts.some(Number.isNaN)) return NaN;
-  return parts.reduce((total, part) => total * 60 + part, 0);
-}
-
-async function api(path, options = {}) {
-  const response = await fetch(API + path, {
-    ...options,
-    headers: { "Content-Type": "application/json", "X-Clipper-Token": token, ...options.headers },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
-  return data;
-}
+const refreshJobs = jobList("jobs", "jobs-section");
 
 // Runs inside the YouTube tab.
 function readPlayer() {
@@ -71,13 +44,6 @@ function saveDraft() {
   showLength();
 }
 
-function showLength() {
-  const length = parse($("end").value) - parse($("start").value);
-  $("length").textContent = Number.isFinite(length)
-    ? `Clip length: ${length.toFixed(1)}s${length > 180 ? " (too long: Shorts max out at 3 minutes)" : ""}`
-    : "";
-}
-
 async function setNow(field) {
   const fresh = await readVideo();
   if (fresh) $(field).value = fmt(fresh.time);
@@ -86,29 +52,12 @@ async function setNow(field) {
 
 async function createClip() {
   $("error").textContent = "";
-  const start = parse($("start").value);
-  const end = parse($("end").value);
-  if (!(end > start)) return ($("error").textContent = "Set a start and an end after it.");
-  if (end - start > 180) return ($("error").textContent = "Shorts can be at most 3 minutes.");
-  if ($("auto-upload").checked && !$("title").value.trim()) return ($("error").textContent = "Add a title to upload.");
   $("create").disabled = true;
   try {
+    const options = clipOptions();
     await api("/jobs", {
       method: "POST",
-      body: JSON.stringify({
-        url: video.url,
-        sourceTitle: video.title,
-        start,
-        end,
-        title: $("title").value,
-        description: $("description").value,
-        tags: $("tags").value,
-        framing: $("framing").value,
-        privacy: $("privacy").value,
-        autoUpload: $("auto-upload").checked,
-        captions: $("captions").checked,
-        lang: $("lang").value,
-      }),
+      body: JSON.stringify({ url: video.url, sourceTitle: video.title, ...options }),
     });
     chrome.storage.local.remove(`draft:${video.videoId}`);
     $("start").value = $("end").value = "";
@@ -121,62 +70,6 @@ async function createClip() {
   }
 }
 
-function jobItem(job) {
-  const li = document.createElement("li");
-  const title = document.createElement("div");
-  title.className = "title";
-  title.textContent = job.title || job.sourceTitle || job.videoId;
-  const status = document.createElement("div");
-  status.className = "status";
-  status.textContent = `${fmt(job.start)}–${fmt(job.end)} · ${job.status}: ${job.message}`;
-  li.append(title, status);
-
-  const actions = document.createElement("div");
-  actions.className = "actions";
-  if (job.hasClip) {
-    const preview = document.createElement("a");
-    preview.textContent = "Preview";
-    preview.href = `${API}/clips/${job.id}.mp4?token=${encodeURIComponent(token)}`;
-    preview.target = "_blank";
-    actions.append(preview);
-  }
-  if (job.hasClip && (job.status === "ready" || job.status === "failed")) {
-    const upload = document.createElement("button");
-    upload.textContent = job.status === "failed" ? "Retry upload" : `Upload (${job.privacy})`;
-    upload.onclick = async () => {
-      upload.disabled = true;
-      try {
-        await api(`/jobs/${job.id}/upload`, { method: "POST", body: "{}" });
-      } catch (error) {
-        status.textContent = error.message;
-      }
-      refreshJobs();
-    };
-    actions.append(upload);
-  }
-  if (job.youtubeId) {
-    const link = document.createElement("a");
-    link.textContent = "Open on YouTube";
-    link.href = `https://youtube.com/shorts/${job.youtubeId}`;
-    link.target = "_blank";
-    actions.append(link);
-  }
-  if (actions.childElementCount) li.append(actions);
-  return li;
-}
-
-async function refreshJobs() {
-  clearTimeout(pollTimer);
-  try {
-    const { jobs } = await api("/jobs");
-    $("jobs-section").hidden = jobs.length === 0;
-    $("jobs").replaceChildren(...jobs.map(jobItem));
-    if (jobs.some((j) => BUSY.includes(j.status))) pollTimer = setTimeout(refreshJobs, 1500);
-  } catch {
-    pollTimer = setTimeout(refreshJobs, 3000);
-  }
-}
-
 function showSetup(message) {
   $("setup").hidden = false;
   $("setup-text").textContent = message;
@@ -184,23 +77,13 @@ function showSetup(message) {
 }
 
 async function init() {
-  ({ token = "" } = await chrome.storage.local.get("token"));
-  let health;
-  try {
-    health = await (await fetch(`${API}/health`, { headers: { "X-Clipper-Token": token } })).json();
-  } catch {
-    $("conn").textContent = "companion offline";
-    $("conn").className = "pill bad";
+  const state = await connect();
+  if (state === "offline") {
     return showSetup("Start the companion first: open a terminal in the companion folder and run  python server.py");
   }
-  if (!health.paired) {
-    $("conn").textContent = "not paired";
-    $("conn").className = "pill bad";
-    return showSetup("Paste the pairing token that server.py printed when it started.");
-  }
-  $("conn").textContent = "connected";
-  $("conn").className = "pill ok";
+  if (state === "unpaired") return showSetup("Paste the pairing token that server.py printed when it started.");
 
+  $("record").hidden = false;
   try {
     video = await readVideo();
   } catch {
@@ -208,7 +91,7 @@ async function init() {
   }
   if (video) {
     $("editor").hidden = false;
-    $("source").textContent = `${video.title} (${fmt(video.duration || 0)})`;
+    $("source").textContent = `${video.title} (${fmt(video.duration)})`;
     await loadDraft();
   } else {
     $("not-youtube").hidden = false;
@@ -224,6 +107,7 @@ $("settings").onclick = (event) => {
   event.preventDefault();
   $("setup").hidden ? showSetup("Pairing token from server.py:") : ($("setup").hidden = true);
 };
+$("record").onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL("recorder.html") });
 $("set-start").onclick = () => setNow("start");
 $("set-end").onclick = () => setNow("end");
 $("create").onclick = createClip;

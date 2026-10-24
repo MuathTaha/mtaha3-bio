@@ -118,6 +118,19 @@ class AssTests(unittest.TestCase):
 class ClipTests(unittest.TestCase):
     URL = "https://www.youtube.com/watch?v=TESTVIDEO01"
 
+    def setUp(self):
+        patch = mock.patch.object(captions, "whisper_available", return_value=True)
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def test_missing_speech_recognition_is_reported(self):
+        with mock.patch.object(captions, "whisper_available", return_value=False), \
+                mock.patch.object(shorts, "download", return_value=self.source), \
+                mock.patch.object(captions, "fetch_youtube_captions", return_value=None):
+            _, source, problem = shorts.make_clip(self.URL, 0, 2, self.tmp / "nowhisper.mp4", log=lambda m: None)
+        self.assertIsNone(source)
+        self.assertIn("install faster-whisper", problem)
+
     @classmethod
     def setUpClass(cls):
         cls.tmp = Path(tempfile.mkdtemp())
@@ -170,7 +183,7 @@ class ClipTests(unittest.TestCase):
         with mock.patch.object(shorts, "download", return_value=self.source), \
                 mock.patch.object(captions, "fetch_youtube_captions", return_value=vtt), \
                 mock.patch.object(captions, "transcribe") as transcribe:
-            _, source = shorts.make_clip(self.URL, 2, 7, self.tmp / "yt.mp4", log=lambda m: None)
+            _, source, _ = shorts.make_clip(self.URL, 2, 7, self.tmp / "yt.mp4", log=lambda m: None)
         self.assertEqual(source, "YouTube captions")
         transcribe.assert_not_called()
 
@@ -178,21 +191,22 @@ class ClipTests(unittest.TestCase):
         with mock.patch.object(shorts, "download", return_value=self.source), \
                 mock.patch.object(captions, "fetch_youtube_captions", return_value=None), \
                 mock.patch.object(captions, "transcribe", return_value=[(2.5, 3.0, "Hello")]):
-            _, source = shorts.make_clip(self.URL, 2, 7, self.tmp / "asr.mp4", log=lambda m: None)
+            _, source, _ = shorts.make_clip(self.URL, 2, 7, self.tmp / "asr.mp4", log=lambda m: None)
         self.assertEqual(source, "speech recognition")
 
     def test_make_clip_without_any_captions_still_cuts(self):
         with mock.patch.object(shorts, "download", return_value=self.source), \
                 mock.patch.object(captions, "fetch_youtube_captions", return_value=None), \
                 mock.patch.object(captions, "transcribe", side_effect=RuntimeError("no model")):
-            clip, source = shorts.make_clip(self.URL, 2, 7, self.tmp / "none.mp4", log=lambda m: None)
+            clip, source, problem = shorts.make_clip(self.URL, 2, 7, self.tmp / "none.mp4", log=lambda m: None)
         self.assertIsNone(source)
+        self.assertEqual(problem, "speech recognition failed: no model")
         self.assertTrue(clip.exists())
 
     def test_captions_can_be_turned_off(self):
         with mock.patch.object(shorts, "download", return_value=self.source), \
                 mock.patch.object(captions, "fetch_youtube_captions") as fetch:
-            _, source = shorts.make_clip(self.URL, 0, 2, self.tmp / "off.mp4", with_captions=False, log=lambda m: None)
+            _, source, _ = shorts.make_clip(self.URL, 0, 2, self.tmp / "off.mp4", with_captions=False, log=lambda m: None)
         self.assertIsNone(source)
         fetch.assert_not_called()
 
@@ -207,6 +221,92 @@ class DownloadCacheTests(unittest.TestCase):
             self.assertIsNone(shorts.cached_video("dQw4w9WgXcQ"))
             (tmp / "dQw4w9WgXcQ.mp4").write_text("")
             self.assertEqual(shorts.cached_video("dQw4w9WgXcQ"), tmp / "dQw4w9WgXcQ.mp4")
+
+
+@unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg not installed")
+class RecordingTests(unittest.TestCase):
+    """The extension streams a MediaRecorder WebM in pieces; the companion
+    reassembles it, and clips are cut from it like from a YouTube video."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp)
+        patches = [
+            mock.patch.object(server, "RECORDINGS", self.tmp / "recordings"),
+            mock.patch.object(server, "RECORDINGS_FILE", self.tmp / "recordings.json"),
+            mock.patch.dict(server.recordings, clear=True),
+        ]
+        for patch in patches:
+            patch.start()
+            self.addCleanup(patch.stop)
+        # A WebM like Chrome's MediaRecorder makes: VP8/VP9 video, Opus audio, no seek index.
+        self.webm = self.tmp / "screen.webm"
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc2=size=1280x720:rate=30",
+             "-f", "lavfi", "-i", "sine=frequency=300", "-t", "6", "-c:v", "libvpx", "-deadline", "realtime",
+             "-b:v", "1M", "-c:a", "libopus", "-cues_to_front", "0", "-reserve_index_space", "0", str(self.webm)],
+            check=True,
+        )
+
+    def record(self, chunk_size=50_000):
+        rec = server.new_recording({"name": "Webinar"})
+        data = self.webm.read_bytes()
+        for seq, offset in enumerate(range(0, len(data), chunk_size)):
+            server.append_chunk(rec["id"], seq, data[offset:offset + chunk_size])
+        return rec
+
+    def test_chunks_are_reassembled_into_a_seekable_recording(self):
+        rec = self.record()
+        done = server.finish_recording(rec["id"])
+        self.assertEqual(done["status"], "ready", done.get("error"))
+        self.assertAlmostEqual(done["duration"], 6.0, delta=0.2)
+        self.assertFalse((server.RECORDINGS / f"{rec['id']}.part").exists())
+
+    def test_chunks_must_arrive_in_order_and_resends_are_ignored(self):
+        rec = server.new_recording({})
+        self.assertTrue(rec["name"].startswith("Recording "))
+        server.append_chunk(rec["id"], 0, b"abc")
+        server.append_chunk(rec["id"], 0, b"abc")  # retried after a lost response
+        with self.assertRaises(shorts.ClipError):
+            server.append_chunk(rec["id"], 2, b"skipped one")
+        self.assertEqual((server.RECORDINGS / f"{rec['id']}.part").read_bytes(), b"abc")
+
+    def test_finished_recordings_take_no_more_chunks(self):
+        rec = self.record()
+        server.finish_recording(rec["id"])
+        with self.assertRaises(shorts.ClipError):
+            server.append_chunk(rec["id"], 99, b"late")
+
+    def test_empty_recording_fails_cleanly(self):
+        rec = server.new_recording({})
+        self.assertEqual(server.finish_recording(rec["id"])["status"], "failed")
+
+    def test_clip_from_recording_uses_speech_recognition_only(self):
+        rec = self.record()
+        server.finish_recording(rec["id"])
+        job = server.new_job({"recordingId": rec["id"], "start": 1, "end": 4})
+        self.assertEqual((job["recordingId"], job["sourceTitle"]), (rec["id"], "Webinar"))
+        self.assertNotIn("url", job)
+        with self.assertRaises(shorts.ClipError):
+            server.new_job({"recordingId": rec["id"], "start": 30, "end": 40})  # after the end
+        with self.assertRaises(shorts.ClipError):
+            server.new_job({"recordingId": "000000000000", "start": 1, "end": 4})
+
+        source = server.RECORDINGS / f"{rec['id']}.webm"
+        with mock.patch.object(captions, "fetch_youtube_captions") as fetch, \
+                mock.patch.object(captions, "whisper_available", return_value=True), \
+                mock.patch.object(captions, "transcribe", return_value=[(1.5, 2.0, "Welcome")]):
+            clip, caption_source, _ = shorts.make_clip(
+                None, 1, 4, self.tmp / "clip.mp4", source=source, log=lambda m: None
+            )
+        fetch.assert_not_called()
+        self.assertEqual(caption_source, "speech recognition")
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "stream=codec_type,width,height", "-of", "csv=p=0", str(clip)],
+            capture_output=True, text=True, check=True,
+        ).stdout.split()
+        self.assertIn("video,1080,1920", out)
+        self.assertIn("audio", out)
 
 
 class JobValidationTests(unittest.TestCase):

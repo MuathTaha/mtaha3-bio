@@ -143,6 +143,12 @@ def fetch_youtube_captions(url, video_id, folder, lang="en", log=print):
 _whisper_model = None
 
 
+def whisper_available():
+    import importlib.util
+
+    return importlib.util.find_spec("faster_whisper") is not None
+
+
 def transcribe(source, start, end, lang="en", log=print):
     """Transcribe [start, end] locally with faster-whisper, if it is installed."""
     global _whisper_model

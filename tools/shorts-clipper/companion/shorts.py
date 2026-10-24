@@ -113,22 +113,39 @@ def clip_range(start, end):
     return start, end
 
 
+def media_duration(path):
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(path)],
+        capture_output=True, text=True,
+    )
+    try:
+        return float(result.stdout.strip())
+    except ValueError:
+        return None
+
+
 def caption_words(url, source, start, end, lang="en", log=print):
-    """Find spoken words for the clip; returns (words, where they came from)."""
+    """Find spoken words for the clip.
+
+    Returns (words, where they came from, why there are none). YouTube videos
+    use their own captions first; recordings (url None) go straight to local
+    speech recognition.
+    """
     log("Looking for captions ...")
-    vtt = captions.fetch_youtube_captions(url, video_id(url), DOWNLOADS, lang, log)
+    vtt = captions.fetch_youtube_captions(url, video_id(url), DOWNLOADS, lang, log) if url else None
     if vtt:
         words = captions.parse_vtt(vtt.read_text(encoding="utf-8"))
         if any(e > start and s < end for s, e, _ in words):
-            return words, "YouTube captions"
+            return words, "YouTube captions", None
+    if not captions.whisper_available():
+        return [], None, "no captions available; install faster-whisper for speech recognition"
     try:
         words = captions.transcribe(source, start, end, lang, log)
     except Exception as error:  # captions are optional; never fail the clip
-        log(f"Transcription failed: {error}")
-        words = None
+        return [], None, f"speech recognition failed: {str(error)[:200]}"
     if words:
-        return words, "speech recognition"
-    return [], None
+        return words, "speech recognition", None
+    return [], None, "no speech found"
 
 
 def cut(source, start, end, out_path, framing="blur", words=None, log=print):
@@ -164,14 +181,21 @@ def cut(source, start, end, out_path, framing="blur", words=None, log=print):
     return out_path
 
 
-def make_clip(url, start, end, out_path, framing="blur", with_captions=True, lang="en", log=print):
-    """Download, caption and cut one clip. Returns (clip path, caption source or None)."""
+def make_clip(url, start, end, out_path, framing="blur", with_captions=True, lang="en", log=print, source=None):
+    """Caption and cut one clip from a YouTube url, or from a local `source` file
+    such as a screen recording.
+
+    Returns (clip path, caption source or None, why there are no captions or None).
+    """
     start, end = clip_range(start, end)
-    source = download(url, log=log)
-    words, caption_source = caption_words(url, source, start, end, lang, log) if with_captions else ([], None)
-    if with_captions and not caption_source:
-        log("No captions found for this part of the video; cutting without them.")
-    return cut(source, start, end, out_path, framing, words, log=log), caption_source
+    if source is None:
+        source = download(url, log=log)
+    words, caption_source, problem = (
+        caption_words(url, source, start, end, lang, log) if with_captions else ([], None, None)
+    )
+    if problem:
+        log(f"Cutting without captions: {problem}.")
+    return cut(source, start, end, out_path, framing, words, log=log), caption_source, problem
 
 
 def youtube_client(log=print):
@@ -252,10 +276,11 @@ def main():
     try:
         start, end = clip_range(args.start, args.end)
         name = f"{video_id(args.url)}_{start:.0f}-{end:.0f}.mp4"
-        clip, caption_source = make_clip(
+        clip, caption_source, problem = make_clip(
             args.url, start, end, CLIPS / name, args.framing, not args.no_captions, args.lang
         )
-        print(f"Clip saved: {clip}" + (f" (captions from {caption_source})" if caption_source else ""))
+        note = f"captions from {caption_source}" if caption_source else problem
+        print(f"Clip saved: {clip}" + (f" ({note})" if note else ""))
         if args.upload:
             tags = [t.strip() for t in args.tags.split(",")]
             vid = upload(clip, args.title, args.description, tags, args.privacy)
