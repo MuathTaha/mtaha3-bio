@@ -1,6 +1,6 @@
 const API = "http://127.0.0.1:8765";
-const BUSY = ["queued", "downloading", "cutting", "uploading"];
-const FIELDS = ["start", "end", "title", "description", "tags", "framing", "privacy"];
+const BUSY = ["queued", "working", "uploading"];
+const FIELDS = ["start", "end", "title", "description", "tags", "framing", "privacy", "lang"];
 const $ = (id) => document.getElementById(id);
 
 let token = "";
@@ -56,15 +56,17 @@ async function readVideo() {
 async function loadDraft() {
   const key = `draft:${video.videoId}`;
   const { [key]: draft = {} } = await chrome.storage.local.get(key);
-  const defaults = { title: video.title.slice(0, 90), framing: "blur", privacy: "private" };
+  const defaults = { title: video.title.slice(0, 90), framing: "blur", privacy: "private", lang: "en" };
   for (const field of FIELDS) $(field).value = draft[field] ?? defaults[field] ?? "";
   $("auto-upload").checked = !!draft.autoUpload;
+  $("captions").checked = draft.captions ?? true;
   showLength();
 }
 
 function saveDraft() {
   const draft = Object.fromEntries(FIELDS.map((f) => [f, $(f).value]));
   draft.autoUpload = $("auto-upload").checked;
+  draft.captions = $("captions").checked;
   chrome.storage.local.set({ [`draft:${video.videoId}`]: draft });
   showLength();
 }
@@ -104,6 +106,8 @@ async function createClip() {
         framing: $("framing").value,
         privacy: $("privacy").value,
         autoUpload: $("auto-upload").checked,
+        captions: $("captions").checked,
+        lang: $("lang").value,
       }),
     });
     chrome.storage.local.remove(`draft:${video.videoId}`);
@@ -223,6 +227,6 @@ $("settings").onclick = (event) => {
 $("set-start").onclick = () => setNow("start");
 $("set-end").onclick = () => setNow("end");
 $("create").onclick = createClip;
-for (const field of [...FIELDS, "auto-upload"]) $(field).addEventListener("input", () => video && saveDraft());
+for (const field of [...FIELDS, "auto-upload", "captions"]) $(field).addEventListener("input", () => video && saveDraft());
 
 init();

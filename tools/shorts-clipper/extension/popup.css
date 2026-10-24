@@ -17,6 +17,7 @@ h1 { font-size: 15px; margin: 0; }
 h2 { font-size: 13px; margin: 14px 0 6px; }
 label { display: block; margin: 6px 0; color: var(--muted); font-size: 12px; }
 label.check { display: flex; gap: 6px; align-items: center; color: var(--fg); }
+.row label.check { padding-bottom: 8px; }
 input, textarea, select { width: 100%; margin-top: 2px; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); color: var(--fg); font: inherit; }
 label.check input { width: auto; margin: 0; }
 .row { display: flex; gap: 6px; align-items: flex-end; }

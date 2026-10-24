@@ -65,9 +65,19 @@ The first time you upload, a browser tab opens so you can sign in and choose you
 4. Add a title. A description and tags are optional, and `#Shorts` is added for you. Then choose the framing:
    - **Fit, blurred background** keeps the whole picture.
    - **Fill, crop sides** fills the screen.
-5. Click **Create clip**. When it says *ready*, click **Preview** to check it, then click **Upload**. You can tick **Upload as soon as the clip is cut** to skip that step.
+5. Leave **Add captions** ticked to burn in Shorts-style captions (see below), and set the language code, for example `en` or `ar`.
+6. Click **Create clip**. When it says *ready*, click **Preview** to check it, then click **Upload**. You can tick **Upload as soon as the clip is cut** to skip that step.
 
 Clips are saved in `companion/data/clips/`. Each source video is downloaded once and reused for every clip you cut from it.
+
+## Captions
+
+Captions show 2–3 words at a time in bold white text, with the word being spoken in yellow, placed just under the video. The words come from:
+
+1. **The video's YouTube captions** (the default): uploaded captions if the creator added them, otherwise YouTube's auto-generated ones. This needs nothing extra.
+2. **Speech recognition on your computer** when the video has no captions. This uses faster-whisper, which is free and runs offline after the first use. The first time, it downloads a speech model of about 500 MB. To use a smaller, faster model, set `WHISPER_MODEL=base` before starting `server.py`.
+
+If neither finds speech, the clip is still made, just without captions.
 
 ## Without the extension
 
@@ -75,6 +85,15 @@ You can also cut and upload clips straight from the terminal:
 
 ```bash
 python shorts.py "https://www.youtube.com/watch?v=VIDEO_ID" 1:05 1:42 --title "My clip" --upload --privacy unlisted
+python shorts.py ... --lang ar          # caption language
+python shorts.py ... --no-captions
+```
+
+## Tests
+
+```bash
+cd companion
+python -m unittest -v test_shorts
 ```
 
 ## Troubleshooting

@@ -11,7 +11,10 @@ import json
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
+
+import captions
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -51,14 +54,22 @@ def check_tools():
         raise ClipError("ffmpeg is not installed or not on PATH (see README).")
 
 
+VIDEO_EXTS = {".mp4", ".mkv", ".webm", ".mov"}
+
+
+def cached_video(vid):
+    # Captions are cached in the same folder (VIDEO_ID.en.vtt), so match whole names.
+    return next((p for p in sorted(DOWNLOADS.glob(f"{vid}.*")) if p.stem == vid and p.suffix in VIDEO_EXTS), None)
+
+
 def download(url, log=print):
     """Download the source video once (up to 1080p) and reuse it for every clip."""
     import yt_dlp
 
     vid = video_id(url)
     DOWNLOADS.mkdir(parents=True, exist_ok=True)
-    cached = next(DOWNLOADS.glob(f"{vid}.*"), None)
-    if cached and cached.suffix != ".part":
+    cached = cached_video(vid)
+    if cached:
         log(f"Using cached download {cached.name}")
         return cached
 
@@ -73,7 +84,7 @@ def download(url, log=print):
     }
     with yt_dlp.YoutubeDL(options) as ydl:
         ydl.download([f"https://www.youtube.com/watch?v={vid}"])
-    result = next(DOWNLOADS.glob(f"{vid}.mp4"), None) or next(DOWNLOADS.glob(f"{vid}.*"), None)
+    result = cached_video(vid)
     if not result:
         raise ClipError("Download finished but no file was found.")
     return result
@@ -85,10 +96,10 @@ FRAMING_FILTERS = {
         "[0:v]split=2[bg][fg];"
         "[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=20:5[bg];"
         "[fg]scale=1080:1920:force_original_aspect_ratio=decrease[fg];"
-        "[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1[v]"
+        "[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1"
     ),
     # Fills the screen by cutting off the left and right edges.
-    "crop": "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1[v]",
+    "crop": "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1",
 }
 
 
@@ -102,31 +113,65 @@ def clip_range(start, end):
     return start, end
 
 
-def cut(source, start, end, out_path, framing="blur", log=print):
-    """Cut [start, end] from source into a 1080x1920 H.264 MP4."""
+def caption_words(url, source, start, end, lang="en", log=print):
+    """Find spoken words for the clip; returns (words, where they came from)."""
+    log("Looking for captions ...")
+    vtt = captions.fetch_youtube_captions(url, video_id(url), DOWNLOADS, lang, log)
+    if vtt:
+        words = captions.parse_vtt(vtt.read_text(encoding="utf-8"))
+        if any(e > start and s < end for s, e, _ in words):
+            return words, "YouTube captions"
+    try:
+        words = captions.transcribe(source, start, end, lang, log)
+    except Exception as error:  # captions are optional; never fail the clip
+        log(f"Transcription failed: {error}")
+        words = None
+    if words:
+        return words, "speech recognition"
+    return [], None
+
+
+def cut(source, start, end, out_path, framing="blur", words=None, log=print):
+    """Cut [start, end] from source into a 1080x1920 H.264 MP4, burning in
+    captions when words [(start, end, text)] are given."""
     check_tools()
     start, end = clip_range(start, end)
     duration = end - start
     if framing not in FRAMING_FILTERS:
         raise ClipError(f"Framing must be one of {sorted(FRAMING_FILTERS)}.")
 
-    out_path = Path(out_path)
+    out_path = Path(out_path).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    log(f"Cutting {duration:.1f}s clip ({framing}) ...")
-    cmd = [
-        "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-        "-ss", f"{start:.3f}", "-i", str(source), "-t", f"{duration:.3f}",
-        "-filter_complex", FRAMING_FILTERS[framing],
-        "-map", "[v]", "-map", "0:a?",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "128k",
-        "-movflags", "+faststart",
-        str(out_path),
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    log(f"Cutting {duration:.1f}s clip ({framing}{', with captions' if words else ''}) ...")
+    with tempfile.TemporaryDirectory() as tmp:
+        graph = FRAMING_FILTERS[framing]
+        if words and captions.write_ass(words, start, end, Path(tmp) / "captions.ass"):
+            # Run ffmpeg inside tmp so the subtitle path needs no filter escaping.
+            graph += ",ass=captions.ass"
+        cmd = [
+            "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+            "-ss", f"{start:.3f}", "-i", str(Path(source).resolve()), "-t", f"{duration:.3f}",
+            "-filter_complex", graph + "[v]",
+            "-map", "[v]", "-map", "0:a?",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            str(out_path),
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
     if result.returncode != 0:
         raise ClipError(f"ffmpeg failed: {result.stderr.strip()[-500:]}")
     return out_path
+
+
+def make_clip(url, start, end, out_path, framing="blur", with_captions=True, lang="en", log=print):
+    """Download, caption and cut one clip. Returns (clip path, caption source or None)."""
+    start, end = clip_range(start, end)
+    source = download(url, log=log)
+    words, caption_source = caption_words(url, source, start, end, lang, log) if with_captions else ([], None)
+    if with_captions and not caption_source:
+        log("No captions found for this part of the video; cutting without them.")
+    return cut(source, start, end, out_path, framing, words, log=log), caption_source
 
 
 def youtube_client(log=print):
@@ -198,16 +243,19 @@ def main():
     parser.add_argument("--description", default="")
     parser.add_argument("--tags", default="", help="comma separated")
     parser.add_argument("--framing", choices=sorted(FRAMING_FILTERS), default="blur")
+    parser.add_argument("--no-captions", action="store_true", help="skip automatic captions")
+    parser.add_argument("--lang", default="en", help="caption language code, e.g. en, ar, fr")
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--privacy", choices=["private", "unlisted", "public"], default="private")
     args = parser.parse_args()
 
     try:
         start, end = clip_range(args.start, args.end)
-        source = download(args.url)
         name = f"{video_id(args.url)}_{start:.0f}-{end:.0f}.mp4"
-        clip = cut(source, args.start, args.end, CLIPS / name, args.framing)
-        print(f"Clip saved: {clip}")
+        clip, caption_source = make_clip(
+            args.url, start, end, CLIPS / name, args.framing, not args.no_captions, args.lang
+        )
+        print(f"Clip saved: {clip}" + (f" (captions from {caption_source})" if caption_source else ""))
         if args.upload:
             tags = [t.strip() for t in args.tags.split(",")]
             vid = upload(clip, args.title, args.description, tags, args.privacy)

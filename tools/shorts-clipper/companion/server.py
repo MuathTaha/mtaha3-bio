@@ -19,7 +19,7 @@ import shorts
 HOST, PORT = "127.0.0.1", 8765
 CONFIG = shorts.DATA / "config.json"
 JOBS_FILE = shorts.DATA / "jobs.json"
-BUSY = {"queued", "downloading", "cutting", "uploading"}
+BUSY = {"queued", "working", "uploading"}
 
 jobs = {}
 lock = threading.Lock()
@@ -73,11 +73,14 @@ def worker():
         try:
             if action == "make":
                 job = jobs[job_id]
-                update(job_id, status="downloading")
-                source = shorts.download(job["url"], log=log)
-                update(job_id, status="cutting")
-                shorts.cut(source, job["start"], job["end"], shorts.CLIPS / job["file"], job["framing"], log=log)
-                update(job_id, status="ready", message="Clip ready to preview.")
+                update(job_id, status="working")
+                _, caption_source = shorts.make_clip(
+                    job["url"], job["start"], job["end"], shorts.CLIPS / job["file"], job["framing"],
+                    job["captions"], job["lang"], log=log,
+                )
+                note = f"with {caption_source}" if caption_source else "no captions" if job["captions"] else ""
+                update(job_id, status="ready", captionSource=caption_source,
+                       message=f"Clip ready to preview{f' ({note})' if note else ''}.")
                 if job["autoUpload"]:
                     run_upload(job_id)
             elif action == "upload":
@@ -98,6 +101,9 @@ def new_job(data):
     privacy = data.get("privacy", "private")
     if privacy not in ("private", "unlisted", "public"):
         raise shorts.ClipError("Unknown privacy setting.")
+    lang = str(data.get("lang") or "en").strip()
+    if not re.fullmatch(r"[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?", lang):
+        raise shorts.ClipError("Caption language should be a code like en, ar or pt-BR.")
     job_id = uuid.uuid4().hex[:12]
     return {
         "id": job_id,
@@ -111,6 +117,8 @@ def new_job(data):
         "tags": [t.strip() for t in str(data.get("tags", "")).split(",") if t.strip()],
         "privacy": privacy,
         "framing": framing,
+        "captions": bool(data.get("captions", True)),
+        "lang": lang,
         "autoUpload": bool(data.get("autoUpload")),
         "file": f"{job_id}.mp4",
         "status": "queued",
@@ -156,7 +164,7 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/jobs":
             with lock:
                 recent = sorted(jobs.values(), key=lambda j: j["created"], reverse=True)[:20]
-            recent = [{**j, "hasClip": j["status"] not in ("queued", "downloading", "cutting")
+            recent = [{**j, "hasClip": j["status"] not in ("queued", "working")
                        and (shorts.CLIPS / j["file"]).exists()} for j in recent]
             return self.send_json(200, {"jobs": recent})
         match = re.fullmatch(r"/clips/([0-9a-f]{12})\.mp4", url.path)
