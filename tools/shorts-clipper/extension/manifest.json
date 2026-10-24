@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Shorts Clipper",
+  "version": "1.0.0",
+  "description": "Mark a moment in a YouTube video, cut it into a vertical Short and upload it to your channel, all on your own computer.",
+  "action": {
+    "default_title": "Shorts Clipper",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://127.0.0.1:8765/*"]
+}

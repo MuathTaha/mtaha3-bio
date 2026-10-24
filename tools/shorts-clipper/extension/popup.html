@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Shorts Clipper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>Shorts Clipper</h1>
+    <span id="conn" class="pill">checking…</span>
+  </header>
+
+  <section id="setup" hidden>
+    <p id="setup-text"></p>
+    <label>Pairing token
+      <input id="token" type="password" placeholder="Printed when you start server.py">
+    </label>
+    <button id="save-token">Save</button>
+  </section>
+
+  <section id="editor" hidden>
+    <p id="source" class="muted"></p>
+    <div class="row">
+      <label>Start
+        <input id="start" placeholder="0:00">
+      </label>
+      <button id="set-start" class="ghost" title="Use the video's current time">⏱ Now</button>
+      <label>End
+        <input id="end" placeholder="0:30">
+      </label>
+      <button id="set-end" class="ghost" title="Use the video's current time">⏱ Now</button>
+    </div>
+    <p id="length" class="muted"></p>
+    <label>Title
+      <input id="title" maxlength="100">
+    </label>
+    <label>Description
+      <textarea id="description" rows="2" placeholder="#Shorts is added automatically"></textarea>
+    </label>
+    <label>Tags
+      <input id="tags" placeholder="comma, separated">
+    </label>
+    <div class="row">
+      <label>Framing
+        <select id="framing">
+          <option value="blur">Fit, blurred background</option>
+          <option value="crop">Fill, crop sides</option>
+        </select>
+      </label>
+      <label>Privacy
+        <select id="privacy">
+          <option value="private">Private</option>
+          <option value="unlisted">Unlisted</option>
+          <option value="public">Public</option>
+        </select>
+      </label>
+    </div>
+    <label class="check"><input id="auto-upload" type="checkbox"> Upload as soon as the clip is cut</label>
+    <button id="create">Create clip</button>
+    <p id="error" class="error"></p>
+  </section>
+
+  <section id="not-youtube" hidden>
+    <p>Open a YouTube video (youtube.com/watch…) and click the extension again.</p>
+  </section>
+
+  <section id="jobs-section" hidden>
+    <h2>Recent clips</h2>
+    <ul id="jobs"></ul>
+  </section>
+
+  <footer><a href="#" id="settings">Settings</a></footer>
+  <script src="popup.js"></script>
+</body>
+</html>

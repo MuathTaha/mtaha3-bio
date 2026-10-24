@@ -1,0 +1,6 @@
+# Downloads, clips, pairing token and YouTube sign-in token
+companion/data/
+# Your Google OAuth client; never commit it
+companion/client_secret*.json
+__pycache__/
+.venv/

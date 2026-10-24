@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone tools with their own runtimes (e.g. a Chrome extension).
+    "tools/**",
   ]),
 ]);
 
