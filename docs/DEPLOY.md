@@ -89,6 +89,14 @@ tracker — brings the banner obligation back with it.
   its script and beacon are same-origin under `/_vercel/insights/`, which the CSP's
   `'self'` already allows, so ad blockers don't treat it as third-party tracking and
   it isn't blocked. Retention depends on the plan.
+- **Vercel Speed Insights** — who visits is Web Analytics; how fast it was for them
+  is this. Core Web Vitals (LCP, CLS, INP) from real visits rather than a synthetic
+  run, broken down by route. Same two caveats as above: `@vercel/speed-insights` is
+  installed and mounted in the root layout, but it collects nothing until Speed
+  Insights is enabled in the Vercel project, and it is metered per plan. No CSP
+  change: in production the script is `/_vercel/speed-insights/script.js` and the
+  beacon is same-origin too, both covered by `'self'`; only the dev-only debug
+  script comes from `va.vercel-scripts.com`.
 - **Plausible** (wired up, dormant) — the tag only renders when
   `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set, and that variable is deliberately unset, so
   nothing loads and nothing is billed. To switch it on: add the site in Plausible,

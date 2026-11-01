@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PlausibleAnalytics } from '@/components/site/PlausibleAnalytics';
 import './globals.css';
 
@@ -44,6 +45,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           covers it; only the dev-only debug script comes from a Vercel host.
         */}
         <Analytics />
+        {/*
+          Speed Insights: Core Web Vitals from real visits. Same arrangement as
+          the line above — in production the script is same-origin
+          (/_vercel/speed-insights/script.js) and so is its beacon, which the
+          CSP's 'self' covers; only the dev-only debug script is fetched from a
+          Vercel host. It collects nothing until Speed Insights is switched on
+          in the Vercel project.
+        */}
+        <SpeedInsights />
         {/* Plausible, keyed on the domain registered there, only when set. */}
         {plausibleDomain ? <PlausibleAnalytics domain={plausibleDomain} /> : null}
       </body>
