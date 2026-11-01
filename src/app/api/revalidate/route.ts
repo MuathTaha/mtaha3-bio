@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
       revalidatePath('/notes');
       // Tag pages list posts, and the payload doesn't say which tags changed.
       revalidatePath('/tag/[slug]', 'page');
+      // A post can join or leave a series, which changes that hub's listing.
+      revalidatePath('/series/[slug]', 'page');
       // A route handler's own tag is its pathname; it has no '/page' variant.
       revalidatePath('/rss.xml');
       revalidatePath('/api/search-index');
@@ -59,6 +61,10 @@ export async function POST(req: NextRequest) {
       revalidatePath('/work');
     } else if (type === 'book') {
       revalidatePath('/books');
+    } else if (type === 'series') {
+      // The title or description changed, and the nav is built from the series
+      // list, so every page's header can differ — refresh the whole tree.
+      revalidatePath('/', 'layout');
     } else if (type === 'comment') {
       // Approving a comment has to show up on the post it belongs to. The
       // payload carries no slug for a comment, so refresh the whole family

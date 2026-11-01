@@ -39,6 +39,8 @@ describe('revalidate webhook', () => {
         ['/essays'],
         ['/notes'],
         ['/tag/[slug]', 'page'],
+        // A post can join or leave a series, changing that hub's listing.
+        ['/series/[slug]', 'page'],
         ['/rss.xml'],
         ['/api/search-index'],
       ])
@@ -49,6 +51,14 @@ describe('revalidate webhook', () => {
     expect(await callsFor({ _type: 'post' })).toEqual(
       expect.arrayContaining<Call>([['/post/[slug]', 'page']])
     );
+  });
+
+  /**
+   * The nav is built from the series list, so a renamed series changes the
+   * header on every page — not just its own hub.
+   */
+  it('refreshes the whole tree for a series edit, since the nav lists series', async () => {
+    expect(await callsFor({ _type: 'series' })).toEqual([['/', 'layout']]);
   });
 
   it('refreshes tag pages, post pages and the search index for a tag edit', async () => {

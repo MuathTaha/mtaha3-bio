@@ -1,12 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { getAllPostSlugs, getAllTags, getProjects } from '@/sanity/lib/queries';
+import { getAllPostSlugs, getAllTags, getProjects, getAllSeries } from '@/sanity/lib/queries';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtaha3.bio';
-  const [slugs, tags, projects] = await Promise.all([
+  const [slugs, tags, projects, series] = await Promise.all([
     getAllPostSlugs(),
     getAllTags(),
     getProjects(),
+    getAllSeries(),
   ]);
   const now = new Date();
 
@@ -23,6 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/post/${s}`,
       lastModified: now,
       priority: 0.9,
+    })),
+    ...series.map((s) => ({
+      url: `${siteUrl}/series/${s.slug}`,
+      lastModified: now,
+      // A series hub is a landing page for a theme, so it ranks above a tag.
+      priority: 0.7,
     })),
     ...tags.map((t) => ({
       url: `${siteUrl}/tag/${t.slug}`,

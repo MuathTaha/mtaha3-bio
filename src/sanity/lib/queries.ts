@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity';
 import type { SanityClient } from 'next-sanity';
 import { client } from './client';
-import type { Comment, Experience, Post, Project, SiteSettings, Tag } from '@/types/content';
+import type { Comment, Experience, Post, Project, Series, SiteSettings, Tag } from '@/types/content';
 import type { Book } from '@/types/book';
 
 const POST_FIELDS = groq`
@@ -16,7 +16,9 @@ const POST_FIELDS = groq`
   updatedAt,
   readingTime,
   ogImage,
-  tags[]->{ _id, name, "slug": slug.current, description }
+  tags[]->{ _id, name, "slug": slug.current, description },
+  series->{ _id, title, "slug": slug.current },
+  seriesOrder
 `;
 
 export async function getPosts(limit = 20, type?: 'essay' | 'note', c: SanityClient = client): Promise<Post[]> {
@@ -67,6 +69,41 @@ export async function getExperiences(c: SanityClient = client): Promise<Experien
       // image URL building, so never hand them to the renderer.
       "photos": photos[defined(asset)]
     }`
+  );
+}
+
+/** Series shown in the nav, in their configured order. */
+export async function getAllSeries(c: SanityClient = client): Promise<Series[]> {
+  return c.fetch(
+    groq`*[_type == "series" && defined(slug.current)] | order(coalesce(order, 100) asc, title asc) {
+      _id, title, "slug": slug.current, description, navLabel, order
+    }`
+  );
+}
+
+export async function getSeriesBySlug(slug: string, c: SanityClient = client): Promise<Series | null> {
+  return c.fetch(
+    groq`*[_type == "series" && slug.current == $slug][0] {
+      _id, title, "slug": slug.current, description, navLabel, order
+    }`,
+    { slug }
+  );
+}
+
+export async function getAllSeriesSlugs(c: SanityClient = client): Promise<string[]> {
+  return c.fetch(groq`*[_type == "series" && defined(slug.current)].slug.current`);
+}
+
+/**
+ * Posts in a series, in reading order: by seriesOrder, then oldest first so a
+ * run reads start to finish. coalesce pushes unnumbered posts to the end rather
+ * than letting a null sort them to the front.
+ */
+export async function getPostsBySeries(slug: string, c: SanityClient = client): Promise<Post[]> {
+  return c.fetch(
+    groq`*[_type == "post" && !(_id in path("drafts.**")) && series->slug.current == $slug]
+      | order(coalesce(seriesOrder, 9999) asc, publishedAt asc) { ${POST_FIELDS} }`,
+    { slug }
   );
 }
 
