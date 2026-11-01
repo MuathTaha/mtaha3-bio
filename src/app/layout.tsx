@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PlausibleAnalytics } from '@/components/site/PlausibleAnalytics';
 import './globals.css';
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           covers it; only the dev-only debug script comes from a Vercel host.
         */}
         <Analytics />
+        <SpeedInsights />
         {/* Plausible, keyed on the domain registered there, only when set. */}
         {plausibleDomain ? <PlausibleAnalytics domain={plausibleDomain} /> : null}
       </body>
