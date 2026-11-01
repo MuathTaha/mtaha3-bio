@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { draftMode } from 'next/headers';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getPostBySlug, getAllPostSlugs } from '@/sanity/lib/queries';
 import { client, draftClient } from '@/sanity/lib/client';
 import { Container } from '@/components/ui/Container';
@@ -97,6 +98,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <Prose>
         <PortableText value={post.body} />
       </Prose>
+      {post.series ? (
+        <p className="mt-10 border-t border-[var(--color-border)] pt-6 text-sm text-[var(--color-fg-muted)]">
+          Part of{' '}
+          <Link
+            href={`/series/${post.series.slug}`}
+            className="text-[var(--color-accent)] hover:underline"
+          >
+            {post.series.title}
+          </Link>
+          .
+        </p>
+      ) : null}
       {post.tags?.length ? (
         <div className="mt-10 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-6">
           {post.tags.map((t) => (

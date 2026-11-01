@@ -31,6 +31,19 @@ export type Post = {
   updatedAt?: string;
   readingTime?: number;
   ogImage?: ImageRef;
+  /** Set when the post belongs to a series; independent of `type`. */
+  series?: Pick<Series, '_id' | 'title' | 'slug'>;
+  seriesOrder?: number;
+};
+
+export type Series = {
+  _id: string;
+  title: string;
+  slug: string;
+  description?: string;
+  /** Shorter label for the nav bar; falls back to `title`. */
+  navLabel?: string;
+  order?: number;
 };
 
 /** A reader's comment, as rendered. Email is never selected into this shape. */

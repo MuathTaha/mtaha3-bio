@@ -155,6 +155,21 @@ export const post = defineType({
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'tag' }] })],
     }),
     defineField({
+      name: 'series',
+      type: 'reference',
+      group: 'content',
+      to: [{ type: 'series' }],
+      description:
+        'Optional. Adding a post to a series does not change its type — it still appears under Essays or Notes.',
+    }),
+    defineField({
+      name: 'seriesOrder',
+      type: 'number',
+      group: 'content',
+      description:
+        'Position within the series (lower = earlier). Posts without one fall to the end, oldest first.',
+    }),
+    defineField({
       name: 'publishedAt',
       type: 'datetime',
       group: 'meta',
